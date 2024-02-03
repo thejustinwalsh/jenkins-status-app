@@ -21,10 +21,20 @@ import {
   XStack,
   YGroup,
   YStack,
+  Switch,
+  Button,
+  Label,
 } from 'tamagui';
 
-import {Medal, ScanSearch, BugPlay, BadgeInfo} from '@tamagui/lucide-icons';
+import {
+  Medal,
+  ScanSearch,
+  BugPlay,
+  BadgeInfo,
+  XCircle,
+} from '@tamagui/lucide-icons';
 import {config} from './tamagui.config';
+import {appBridge} from './lib/native';
 
 function App(): JSX.Element {
   return (
@@ -74,6 +84,56 @@ function App(): JSX.Element {
                 pressTheme>
                 Read the docs to discover what to do next:
               </ListItem>
+            </YGroup.Item>
+          </YGroup>
+          <YGroup
+            alignSelf="center"
+            bordered
+            width="100%"
+            size="$5"
+            marginTop="$5"
+            separator={<Separator />}>
+            <YGroup.Item>
+              <XStack space="$3" $xs={{flexDirection: 'column'}}>
+                {/*
+                <Label
+                  paddingRight="$0"
+                  minWidth={90}
+                  justifyContent="flex-end"
+                  size="$4"
+                  htmlFor="launchAtLogin">
+                  Launch At Login
+                </Label>
+                */}
+                <Separator minHeight={20} vertical />
+
+                <Switch id="launchAtLogin" size="$4">
+                  <Switch.Thumb />
+                </Switch>
+              </XStack>
+            </YGroup.Item>
+            <YGroup.Item>
+              <XStack space="$3" $xs={{flexDirection: 'column'}}>
+                {/*
+                <Label
+                  paddingRight="$0"
+                  minWidth={90}
+                  justifyContent="flex-end"
+                  size="$4"
+                  htmlFor="launchAtLogin">
+                  Close App
+                </Label>
+                <Separator minHeight={20} vertical />
+                */}
+                <Button
+                  id="closeApp"
+                  size="$4"
+                  onPress={() => {
+                    appBridge.closeApp();
+                  }}>
+                  <XCircle />
+                </Button>
+              </XStack>
             </YGroup.Item>
           </YGroup>
         </YStack>
