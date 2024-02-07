@@ -1,7 +1,16 @@
 {
   "extends": "@tsconfig/react-native/tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
     "baseUrl": "./src",
-  }
+    "paths": {
+      "@app/*": ["*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "index.js",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
 }

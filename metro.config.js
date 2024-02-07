@@ -6,13 +6,14 @@
  */
 const fs = require('fs');
 const path = require('path');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 const rnwPath = fs.realpathSync(
   path.resolve(require.resolve('react-native-windows/package.json'), '..'),
 );
 
-module.exports = {
+module.exports = mergeConfig(getDefaultConfig(__dirname), {
   resolver: {
     blockList: exclusionList([
       // This stops "react-native run-windows" from causing the metro server to crash if its already running
@@ -35,4 +36,4 @@ module.exports = {
     // This fixes the 'missing-asset-registry-path` error (see https://github.com/microsoft/react-native-windows/issues/11437)
     assetRegistryPath: 'react-native/Libraries/Image/AssetRegistry',
   },
-};
+});

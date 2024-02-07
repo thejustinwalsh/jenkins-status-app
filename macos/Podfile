@@ -4,7 +4,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 prepare_react_native_project!
 
 target 'app-macOS' do
-  platform :macos, '13.0'
+  platform :macos, '14.0'
   use_native_modules!
 
   # Flags change depending on the env values.
@@ -22,6 +22,5 @@ target 'app-macOS' do
 
   post_install do |installer|
     react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end
