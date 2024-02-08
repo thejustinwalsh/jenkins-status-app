@@ -3,6 +3,8 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleEllipsis,
+  PauseCircle,
+  AlertCircle,
 } from '@tamagui/lucide-icons';
 
 import ListItem from '@app/components/StatusListItem';
@@ -50,19 +52,19 @@ const defaults: {
     },
     failed: {
       color: '$red9',
-      icon: XCircle,
+      icon: AlertCircle,
     },
     inProgress: {
       color: '$color11',
       icon: CircleEllipsis,
     },
     pending: {
-      color: '$yellow9',
-      icon: CircleEllipsis,
+      color: '$blue9',
+      icon: PauseCircle,
     },
     canceled: {
-      color: '$gray9',
-      icon: CircleEllipsis,
+      color: '$color11',
+      icon: XCircle,
     },
   },
 };
