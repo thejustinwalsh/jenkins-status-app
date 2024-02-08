@@ -32,6 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   var bridge: RCTBridge!
   var statusBarItem: NSStatusItem!
   var viewController: NSViewController!
+  var rootView: RCTRootView!
+
+  var popoverWidth: Int = 400
+  var popoverHeight: Int = 400
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     
@@ -43,10 +47,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     #endif
     
     viewController = NSViewController()
-    viewController.view = RCTRootView(bundleURL: jsCodeLocation, moduleName: "app", initialProperties: nil, launchOptions: nil)
+    rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "app", initialProperties: nil, launchOptions: nil)
+    viewController.view = rootView
+    rootView.backgroundColor = NSColor.black
 
     popover = NSWindow(
-      contentRect: NSRect(x: 0, y: 0, width: 600, height: 400),
+      contentRect: NSRect(x: 0, y: 0, width: popoverWidth, height: popoverHeight),
       styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered,
       defer: false
@@ -55,6 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     popover.titleVisibility = .hidden
     popover.isMovableByWindowBackground = false
     popover.isReleasedWhenClosed = false
+    popover.styleMask.remove(.resizable)
     popover.collectionBehavior = [.transient, .ignoresCycle]
     popover.standardWindowButton(.closeButton)?.isHidden = true
     popover.standardWindowButton(.zoomButton)?.isHidden = true
@@ -78,6 +85,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       button.frame = iconView.frame
     }
   }
+  
+  @objc func setBackgroundColor(_ hex: String) {
+    let hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+    let scanner = Scanner(string: hexString)
+    if (hexString.hasPrefix("#")) {
+      scanner.currentIndex = hexString.index(after: hexString.startIndex)
+    }
+    var color: UInt64 = 0
+    scanner.scanHexInt64(&color)
+    let r = CGFloat((color & 0xFF0000) >> 16) / 255.0
+    let g = CGFloat((color & 0x00FF00) >> 8) / 255.0
+    let b = CGFloat(color & 0x0000FF) / 255.0
+
+    rootView.backgroundColor = NSColor(red: r, green: g, blue: b, alpha: 1)
+  }
+
+  @objc func resize(_ width: Int, height: Int) {
+    popoverWidth = width;
+    popoverHeight = height;
+    popover.setContentSize(NSSize(width: popoverWidth, height: popoverHeight))
+  }
 
   @objc func togglePopover(_ sender: AnyObject?) {
     if self.popover.isVisible && self.popover.isKeyWindow {
@@ -89,10 +117,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
       }
       let screen: NSScreen = NSScreen.main!
-      let midScreenX = self.statusBarItem.button!.window!.frame.origin.x - 300
+      let midScreenX = self.statusBarItem.button!.window!.frame.origin.x - (CGFloat)(popoverWidth - 200)
       let posScreenY = screen.frame.height
       let origin = CGPoint(x: Int(midScreenX), y: Int(posScreenY))
-      let size = CGSize(width: 600, height: 700)
+      let size = CGSize(width: popoverWidth, height: popoverHeight)
       let frame = NSRect(origin: origin, size: size)
       self.popover.setFrame(frame, display: true)
     }

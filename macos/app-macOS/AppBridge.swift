@@ -23,6 +23,20 @@ class AppBridge: NSObject {
     resolve(LaunchAtLogin.isEnabled)
   }
   
+  @objc func setBackgroundColor(_ hex: String) {
+    DispatchQueue.main.async {
+      let appDelegate = NSApp.delegate as? AppDelegate
+      appDelegate?.setBackgroundColor(hex)
+    }
+  }
+
+  @objc func resize(_ width: Int, height: Int) {
+    DispatchQueue.main.async {
+      let appDelegate = NSApp.delegate as? AppDelegate
+      appDelegate?.resize(width, height: height)
+    }
+  }
+  
   @objc func closeApp() {
     DispatchQueue.main.async {
       let appDelegate = NSApp.delegate as? AppDelegate
