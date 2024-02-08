@@ -5,9 +5,12 @@
 //  Created by Justin Walsh on 2/2/24.
 //
 
-#import "React/RCTBridgeModule.h"
+#import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(AppBridge, NSObject)
+@interface RCT_EXTERN_MODULE(AppBridge, RCTEventEmitter)
+
+RCT_EXTERN_METHOD(supportedEvents)
 
 RCT_EXTERN_METHOD(launchAtLogin: (BOOL)isEnabled)
 
@@ -18,5 +21,7 @@ RCT_EXTERN_METHOD(setBackgroundColor: (NSString)hex)
 RCT_EXTERN_METHOD(resize: (NSInteger)width height: (NSInteger)height)
 
 RCT_EXTERN_METHOD(closeApp)
+
+RCT_EXTERN_METHOD(consumeKeys: (BOOL)willConsume)
 
 @end

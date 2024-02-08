@@ -1,21 +1,22 @@
-import {NativeModules} from 'react-native';
+import {NativeEventEmitter, NativeModules} from 'react-native';
 
-interface AppBridge {
+class AppBridge extends NativeEventEmitter {
   launchAtLogin: (isEnabled: boolean) => void;
   isLaunchAtLoginEnabled: () => boolean;
   setBackgroundColor: (hex: string) => void;
   resize: (width: number, height: number) => void;
   closeApp: () => void;
+  consumeKeys: (state: boolean) => void;
+
+  constructor(module: any) {
+    super(module);
+    this.launchAtLogin = module.launchAtLogin;
+    this.isLaunchAtLoginEnabled = module.isLaunchAtLoginEnabled;
+    this.setBackgroundColor = module.setBackgroundColor;
+    this.resize = module.resize;
+    this.closeApp = module.closeApp;
+    this.consumeKeys = module.consumeKeys;
+  }
 }
 
-function exportAppBridge(module: any): AppBridge {
-  return {
-    launchAtLogin: module.launchAtLogin,
-    isLaunchAtLoginEnabled: module.isLaunchAtLoginEnabled,
-    setBackgroundColor: module.setBackgroundColor,
-    resize: module.resize,
-    closeApp: module.closeApp,
-  };
-}
-
-export const appBridge = exportAppBridge(NativeModules.AppBridge);
+export const appBridge = new AppBridge(NativeModules.AppBridge);

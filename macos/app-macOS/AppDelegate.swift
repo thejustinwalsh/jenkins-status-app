@@ -29,13 +29,14 @@ class WindowDelegate: NSObject, NSWindowDelegate {
 class AppDelegate: NSObject, NSApplicationDelegate {
   var windowDelegate: WindowDelegate!
   var popover: NSWindow!
-  var bridge: RCTBridge!
   var statusBarItem: NSStatusItem!
   var viewController: NSViewController!
   var rootView: RCTRootView!
-
+  var bridge: AppBridge?
   var popoverWidth: Int = 400
   var popoverHeight: Int = 400
+  
+  public var consumeKeys: Bool = false;
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
     
@@ -83,6 +84,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       iconView.frame = NSRect(x: 0, y: 0, width: 30, height: 22)
       button.addSubview(iconView)
       button.frame = iconView.frame
+    }
+
+    NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
+      if let appBridge = self.getBridge() {
+        let key = String(utf8String: $0.characters?.cString(using: String.Encoding.utf8) ?? [CChar(0)])
+        appBridge.sendKeyDownEvent(key: key, keyCode: $0.keyCode)
+      }
+      
+      return self.consumeKeys ? nil : $0
     }
   }
   
@@ -132,11 +142,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
 
-  func closeApp() {
+  @objc func closeApp() {
     NSApp.terminate(nil)
   }
   
-  func getWindowObject() -> NSView {
-    return viewController.view
+  @objc func getBridge() -> AppBridge? {
+    if let cachedBridge = bridge { return cachedBridge }
+        
+    if self.rootView.bridge.moduleIsInitialized(AppBridge.classForCoder()) {
+      if let appBridge = self.rootView.bridge.module(for: AppBridge.classForCoder()) as? AppBridge {
+        return appBridge
+      }
+    }
+    
+    return nil
   }
 }

@@ -9,11 +9,12 @@ import Foundation
 import LaunchAtLogin
 
 @objc(AppBridge)
-class AppBridge: NSObject {
-  
-  @objc static func requiresMainQueueSetup() -> Bool {
+class AppBridge: RCTEventEmitter {  
+  @objc static override func requiresMainQueueSetup() -> Bool {
     return true
   }
+
+  @objc override func supportedEvents() -> [String] { ["keyDown", "keyUp"] }
   
   @objc func launchAtLogin(_ isEnabled: Bool) {
     LaunchAtLogin.isEnabled = isEnabled
@@ -41,6 +42,29 @@ class AppBridge: NSObject {
     DispatchQueue.main.async {
       let appDelegate = NSApp.delegate as? AppDelegate
       appDelegate?.closeApp()
+    }
+  }
+
+  // Key handlers
+
+  func sendKeyDownEvent(key: String?, keyCode: UInt16) {
+    sendEvent(withName: "keyDown", body: [
+      "key": key ?? "",
+      "keyCode": keyCode,
+    ])
+  }
+
+  func sendKeyUpEvent(key: String?, keyCode: UInt16) {
+    sendEvent(withName: "keyUp", body: [
+      "key":  key ?? "",
+      "keyCode": keyCode,
+    ])
+  }
+  
+  @objc func consumeKeys(_ willConsume: Bool) {
+    DispatchQueue.main.async {
+      let appDelegate = NSApp.delegate as? AppDelegate
+      appDelegate?.consumeKeys = willConsume
     }
   }
 }
