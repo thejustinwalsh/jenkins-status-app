@@ -8,8 +8,7 @@ import {
   CircleEllipsis,
 } from '@tamagui/lucide-icons';
 
-import type {StackProps} from '@app/navigation/Params';
-import ListItem from '@app/components/JobListItem';
+import type {StackProps} from '@app/navigation/params';
 
 export default function HomeScreen({
   navigation,

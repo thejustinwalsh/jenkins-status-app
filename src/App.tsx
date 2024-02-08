@@ -9,7 +9,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import {TamaguiProvider} from 'tamagui';
 
-import type {StackProps} from '@app/navigation/Params';
+import type {StackProps} from '@app/navigation/params';
 import config from './tamagui.config';
 //import {appBridge} from './lib/native';
 import HomeScreen from '@app/screens/HomeScreen';
