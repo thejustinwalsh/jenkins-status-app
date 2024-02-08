@@ -1,3 +1,9 @@
+if (__DEV__) {
+  import('../reactotron.config').then(() =>
+    console.log('Reactotron Configured'),
+  );
+}
+
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
