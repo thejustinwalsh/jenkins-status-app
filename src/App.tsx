@@ -1,10 +1,13 @@
 if (__DEV__) {
   import('../reactotron.config').then(() => console.log('Reactotron ready'));
 }
-
-import {NavigationContainer} from '@react-navigation/native';
+import React from 'react';
+import {
+  NavigationContainer,
+  Theme as NavigationContainerTheme,
+  DefaultTheme as NavigationContainerDefaultTheme,
+} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
 import {TamaguiProvider, useTheme} from 'tamagui';
 
 import config from './tamagui.config';
@@ -18,8 +21,28 @@ import DetailsScreen from '@app/screens/DetailsScreen';
 const Stack = createStackNavigator<StackProps>();
 
 function BackgroundProvider({children}: {children: React.ReactNode}) {
-  appBridge.setBackgroundColor(useTheme().background.get() || '#000000');
-  return <>{children}</>;
+  const background = useTheme().background.get() || '#000000';
+  appBridge.setBackgroundColor(background);
+  const themedChildren = React.Children.map(children, (child, index) =>
+    index === 0 && React.isValidElement(child)
+      ? React.cloneElement(
+          child as React.ReactElement<{
+            theme?: NavigationContainerTheme | undefined;
+          }>,
+          {
+            theme: {
+              ...NavigationContainerDefaultTheme,
+              dark: true,
+              colors: {
+                ...NavigationContainerDefaultTheme.colors,
+                background,
+              },
+            },
+          },
+        )
+      : child,
+  );
+  return <>{themedChildren}</>;
 }
 
 function App(): JSX.Element {
