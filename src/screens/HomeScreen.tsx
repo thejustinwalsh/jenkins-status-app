@@ -1,12 +1,8 @@
 import {useCallback} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {YGroup} from 'tamagui';
-import {
-  XCircle,
-  CheckCircle2,
-  ChevronRight,
-  CircleEllipsis,
-} from '@tamagui/lucide-icons';
+
+import ProjectListItem from '@app/components/ProjectListItem';
 
 import type {StackProps} from '@app/navigation/params';
 
@@ -20,49 +16,26 @@ export default function HomeScreen({
   return (
     <YGroup fullscreen backgroundColor="$background">
       <YGroup.Item>
-        <ListItem
-          hoverTheme
-          pressTheme
-          size="$5"
-          scaleSpace={0.75}
-          scaleIcon={1.75}
-          color="$green9"
-          icon={CheckCircle2}
-          iconAfter={ChevronRight}
+        <ProjectListItem
           title="Succeeded Job Name"
-          subTitle="1 day ago"
+          value="1 day ago"
+          status="succeeded"
           onPress={navigateToDetails}
         />
       </YGroup.Item>
       <YGroup.Item>
-        <ListItem
-          hoverTheme
-          pressTheme
-          size="$5"
-          scaleSpace={0.75}
-          scaleIcon={1.75}
-          color="$red9"
-          icon={XCircle}
-          iconAfter={ChevronRight}
+        <ProjectListItem
           title="Failed Job Name"
-          subTitle="2 days ago"
+          value="2 days ago"
+          status="failed"
         />
       </YGroup.Item>
       <YGroup.Item>
-        <ListItem
-          hoverTheme
-          pressTheme
-          size="$5"
-          scaleSpace={0.75}
-          scaleIcon={1.75}
-          color="$color11"
-          icon={CircleEllipsis}
-          iconAfter={ChevronRight}
+        <ProjectListItem
+          variant="progress"
           title="In-Progress Job Name"
-          subTitle="progress..."
-          hasProgress
-          value={25}
-          max={100}
+          value={50}
+          status="inProgress"
         />
       </YGroup.Item>
     </YGroup>

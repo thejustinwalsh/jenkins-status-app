@@ -140,7 +140,7 @@ function ListItemProgress({value, max}: ProgressProps) {
   return () => (
     <YStack height="$0.75" marginVertical="$2">
       <Progress size="small" opacity={0.5} value={value} max={max}>
-        <Progress.Indicator animation="bouncy" />
+        <Progress.Indicator animation="quick" />
       </Progress>
     </YStack>
   );
