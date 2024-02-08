@@ -1,7 +1,5 @@
 if (__DEV__) {
-  import('../reactotron.config').then(() =>
-    console.log('Reactotron Configured'),
-  );
+  import('../reactotron.config').then(() => console.log('Reactotron ready'));
 }
 
 import {NavigationContainer} from '@react-navigation/native';
