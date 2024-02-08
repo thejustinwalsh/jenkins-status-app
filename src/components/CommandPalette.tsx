@@ -1,6 +1,15 @@
+import {KeyEvent, useKeyEvents} from '@app/hooks/keyEvents';
 import {Searcher} from 'fast-fuzzy';
-import {useCallback, useMemo} from 'react';
-import {Input} from 'tamagui';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {TextInput} from 'react-native';
+import {AnimatePresence, Input, YStack} from 'tamagui';
 
 // TODO: CommandPalette will either fuzzy search through your projects or run a command
 // - When the user starts typing alphanumeric characters summon the command palette and start a fuzzy search through the projects
@@ -19,50 +28,110 @@ export type SearchSet = {
 type SearchableInputProps = {
   terms: SearchSet[];
   onSearchResults?: (results: SearchSet[]) => void;
+  onBlur?: () => void;
 };
 
-type CommandPaletteProps = {
-  terms: SearchSet[];
-  commands: SearchSet[];
+type CommandPaletteProps = SearchableInputProps & {
+  isVisible: boolean;
 };
 
-export function SearchableInput({
+export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
+  function SearchableInput({terms, onSearchResults, onBlur}, ref) {
+    const searcher = useMemo(
+      () => new Searcher(terms, {keySelector: k => k.value}),
+      [terms],
+    );
+    const search = useCallback(
+      (term: string) => {
+        return searcher.search(term);
+      },
+      [searcher],
+    );
+
+    const handleSearch = useCallback(
+      (searchTerm: string) => {
+        const results = search(searchTerm);
+        onSearchResults?.(results);
+      },
+      [search, onSearchResults],
+    );
+
+    const handleBlur = useCallback(() => {
+      // @ts-expect-error - I don't know the types needed to fix this
+      const input = ref?.current as TextInput | undefined;
+      if (input) {
+        input.clear();
+      }
+      onSearchResults?.([]);
+      onBlur?.();
+    }, [onBlur, onSearchResults, ref]);
+
+    return (
+      <Input
+        // @ts-expect-error - types are not exposed on macOS or windows for enableFocusRing
+        enableFocusRing={false}
+        ref={ref}
+        size="$4"
+        fontSize="$8"
+        paddingTop="$2"
+        onChangeText={handleSearch}
+        onBlur={handleBlur}
+      />
+    );
+  },
+);
+
+export default function CommandPalette({
+  isVisible,
   terms,
   onSearchResults,
-}: SearchableInputProps) {
-  const searcher = useMemo(
-    () => new Searcher(terms, {keySelector: k => k.value}),
-    [terms],
-  );
-  const search = useCallback(
-    (term: string) => {
-      return searcher.search(term);
-    },
-    [searcher],
-  );
+}: CommandPaletteProps) {
+  const inputRef = useRef<TextInput>(null);
+  const [visible, setVisible] = useState<boolean>(isVisible);
+  useEffect(() => setVisible(isVisible), [isVisible]);
 
-  const handleSearch = useCallback(
-    (searchTerm: string) => {
-      const results = search(searchTerm);
-      onSearchResults?.(results);
-    },
-    [search, onSearchResults],
-  );
+  const handleKeyEvents = useCallback((event: KeyEvent) => {
+    // Escape - TODO: macOS -> JS keyCode
+    if (event.keyCode === 53) {
+      setVisible(false);
+    }
+    // Enter - TODO: macOS -> JS keyCode
+    if (event.keyCode === 36) {
+      setVisible(true);
+    }
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setVisible(false);
+  }, []);
+
+  const toggleKeyEvents = useKeyEvents(handleKeyEvents);
+
+  useEffect(() => {
+    toggleKeyEvents(!visible);
+    if (visible) {
+      inputRef.current?.focus();
+    }
+  }, [toggleKeyEvents, visible, inputRef]);
 
   return (
-    <Input
-      // @ts-expect-error
-      enableFocusRing={false}
-      size="$4"
-      fontSize="$8"
-      paddingTop="$2"
-      onChangeText={handleSearch}
-    />
+    <AnimatePresence>
+      {visible && (
+        <YStack overflow="hidden" padding="$0" margin="$0">
+          <YStack
+            padding="$5"
+            paddingBottom="$0"
+            enterStyle={{y: 0}}
+            exitStyle={{y: -100}}>
+            <SearchableInput
+              ref={inputRef}
+              terms={terms}
+              onSearchResults={onSearchResults}
+              onBlur={handleBlur}
+            />
+          </YStack>
+        </YStack>
+      )}
+    </AnimatePresence>
   );
-}
-
-export default function CommandPalette({terms, commands}: CommandPaletteProps) {
-  void terms;
-  void commands;
-  return <Input />;
 }

@@ -1,11 +1,11 @@
 import {useCallback, useMemo, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {YGroup, YStack} from 'tamagui';
+import {YGroup} from 'tamagui';
 
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjects} from '@app/hooks/projects';
 
-import {SearchableInput, type SearchSet} from '@app/components/CommandPalette';
+import CommandPalette, {type SearchSet} from '@app/components/CommandPalette';
 import {appBridge} from '@app/lib/native';
 
 import type {StackProps} from '@app/navigation/params';
@@ -64,16 +64,14 @@ export default function HomeScreen({
       minHeight={50}
       onLayout={event => {
         const {width, height} = event.nativeEvent.layout;
-        console.log('HomeScreen layout', width, height);
         appBridge.resize(width, height);
       }}>
       <YGroup.Item>
-        <YStack padding="$5" paddingBottom="$0">
-          <SearchableInput
-            terms={searchTerms}
-            onSearchResults={handleSearchResults}
-          />
-        </YStack>
+        <CommandPalette
+          isVisible={false}
+          terms={searchTerms}
+          onSearchResults={handleSearchResults}
+        />
       </YGroup.Item>
       <YGroup.Item>
         {filteredProjects.map(project => (
