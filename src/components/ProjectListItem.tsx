@@ -80,6 +80,7 @@ export default function ProjectListItem({
     <ListItem
       hoverTheme
       pressTheme
+      overflow="hidden"
       size={defaults.size}
       scaleSpace={defaults.scaleSpace}
       scaleIcon={defaults.scaleIcon}
