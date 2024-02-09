@@ -10,6 +10,23 @@ import {appBridge} from '@app/lib/native';
 
 import type {StackProps} from '@app/navigation/params';
 
+type Commands = 'add' | 'remove' | 'refresh' | 'settings' | 'help' | 'quit';
+
+type CommandSet = SearchSet & {
+  key: React.Key & Commands;
+  macos?: string;
+  windows?: string;
+};
+
+const commands: CommandSet[] = [
+  {key: 'add', value: '<b>Add</b> a new project'},
+  {key: 'remove', value: '<b>Remove</b> a project'},
+  {key: 'refresh', value: '<b>Refresh</b> the project list'},
+  {key: 'settings', value: '<b>Settings</b>'},
+  {key: 'help', value: '<b>Help</b>'},
+  {key: 'quit', value: '<b>Quit</b>', windows: '<b>Exit</b>'},
+];
+
 export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Home'>) {
@@ -70,6 +87,7 @@ export default function HomeScreen({
         <CommandPalette
           isVisible={false}
           terms={searchTerms}
+          commands={commands}
           onSearchResults={handleSearchResults}
         />
       </YGroup.Item>

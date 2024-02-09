@@ -1,4 +1,6 @@
 import {KeyEvent, useKeyEvents} from '@app/hooks/keyEvents';
+import {ListFilter, Terminal} from '@tamagui/lucide-icons';
+import {IconProps} from '@tamagui/helpers-icon';
 import {Searcher} from 'fast-fuzzy';
 import {
   forwardRef,
@@ -9,16 +11,20 @@ import {
   useState,
 } from 'react';
 import {TextInput} from 'react-native';
-import {AnimatePresence, Input, YStack} from 'tamagui';
+import {
+  AnimatePresence,
+  Input,
+  XStack,
+  YStack,
+  getFontSize,
+  useGetThemedIcon,
+} from 'tamagui';
 
 // TODO: CommandPalette will either fuzzy search through your projects or run a command
 // - When the user starts typing alphanumeric characters summon the command palette and start a fuzzy search through the projects
-// - When the user is fuzzy searching the command palette acts like a filter for the projects in the project list
-// - When the user presses enter summon the command palette
-// - When the user presses escape dismiss the command palette
-// - When the user presses the up or down arrow keys navigate through the command palette
+// - When the user presses the up,down or tab keys or clicks on the icon navigate through the command palette list
 // - When the user presses enter on a command run the command
-// - Style the command palette to look like a Select component, so the user may browse the commands available
+// - When the user is in command mode show the autocomplete command list
 
 export type SearchSet = {
   key: React.Key;
@@ -26,6 +32,7 @@ export type SearchSet = {
 };
 
 type SearchableInputProps = {
+  icon?: React.NamedExoticComponent<IconProps>;
   terms: SearchSet[];
   onSearchResults?: (results: SearchSet[]) => void;
   onBlur?: () => void;
@@ -33,10 +40,12 @@ type SearchableInputProps = {
 
 type CommandPaletteProps = SearchableInputProps & {
   isVisible: boolean;
+  commands: SearchSet[];
+  onCommandSelected?: (command: SearchSet) => void;
 };
 
 export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
-  function SearchableInput({terms, onSearchResults, onBlur}, ref) {
+  function SearchableInput({icon, terms, onSearchResults, onBlur}, ref) {
     const searcher = useMemo(
       () => new Searcher(terms, {keySelector: k => k.value}),
       [terms],
@@ -66,47 +75,80 @@ export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
       onBlur?.();
     }, [onBlur, onSearchResults, ref]);
 
+    const size = /*props.size ||*/ '$4';
+    const iconSize = getFontSize(size as any) * /*scaleIcon*/ 2;
+    const getThemedIcon = useGetThemedIcon({
+      size: iconSize,
+      color: /*color as any,*/ '$color10',
+    });
+    const ThemedIcon = getThemedIcon(icon);
+
     return (
-      <Input
-        // @ts-expect-error - types are not exposed on macOS or windows for enableFocusRing
-        enableFocusRing={false}
-        ref={ref}
-        size="$4"
-        fontSize="$8"
-        paddingTop="$2"
-        onChangeText={handleSearch}
-        onBlur={handleBlur}
-      />
+      <XStack
+        borderWidth="$1"
+        borderColor="$color10"
+        borderRadius={10}
+        margin="$0"
+        padding="$0"
+        alignContent="center"
+        justifyContent="center">
+        <Input
+          // @ts-expect-error - types are not exposed on macOS or windows for enableFocusRing
+          enableFocusRing={false}
+          ref={ref}
+          flex={1}
+          size="$4"
+          fontSize="$8"
+          margin="$0"
+          borderWidth="$0"
+          paddingTop="$2"
+          onChangeText={handleSearch}
+          onBlur={handleBlur}
+        />
+        <YStack
+          alignContent="center"
+          justifyContent="center"
+          margin="$0"
+          paddingRight="$3">
+          <>{ThemedIcon}</>
+        </YStack>
+      </XStack>
     );
   },
 );
 
+// TODO: Implement onCommandSelected callback in command mode
+// - Store the filtered command results in a state
+// - When the user presses enter on a command run the command
 export default function CommandPalette({
   isVisible,
   terms,
+  commands,
   onSearchResults,
 }: CommandPaletteProps) {
   const inputRef = useRef<TextInput>(null);
+  const [mode, setMode] = useState<'search' | 'command'>('search');
   const [visible, setVisible] = useState<boolean>(isVisible);
   useEffect(() => setVisible(isVisible), [isVisible]);
 
+  const handleBlur = useCallback(() => setVisible(false), []);
+
   const handleKeyEvents = useCallback((event: KeyEvent) => {
-    // Escape - TODO: macOS -> JS keyCode
-    if (event.keyCode === 53) {
-      setVisible(false);
-    }
     // Enter - TODO: macOS -> JS keyCode
     if (event.keyCode === 36) {
+      setMode('command');
+      setVisible(true);
+    }
+    // Esc - TODO: macOS -> JS keyCode
+    // TODO: the key system is going to capture the key, and make users type it twice when summoning the palette
+    // TODO: we will need to capture the key in native, and inject it into the command palette for a smooth experience
+    else if (event.keyCode !== 53) {
+      setMode('search');
       setVisible(true);
     }
   }, []);
 
-  const handleBlur = useCallback(() => {
-    setVisible(false);
-  }, []);
-
   const toggleKeyEvents = useKeyEvents(handleKeyEvents);
-
   useEffect(() => {
     toggleKeyEvents(!visible);
     if (visible) {
@@ -125,7 +167,8 @@ export default function CommandPalette({
             exitStyle={{y: -100}}>
             <SearchableInput
               ref={inputRef}
-              terms={terms}
+              icon={mode === 'command' ? Terminal : ListFilter}
+              terms={mode === 'command' ? commands : terms}
               onSearchResults={onSearchResults}
               onBlur={handleBlur}
             />
