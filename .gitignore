@@ -69,3 +69,5 @@ yarn-error.log
 # Build results
 *.binlog
 
+# Xcode local env settins 
+.xcode.env.local
