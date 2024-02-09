@@ -1,7 +1,4 @@
-if (__DEV__) {
-  import('../reactotron.config').then(() => console.log('Reactotron ready'));
-}
-import React from 'react';
+import React, {StrictMode} from 'react';
 import {
   NavigationContainer,
   Theme as NavigationContainerTheme,
@@ -47,27 +44,29 @@ function BackgroundProvider({children}: {children: React.ReactNode}) {
 
 function App(): JSX.Element {
   return (
-    <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
-      <BackgroundProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Home"
-            screenOptions={{
-              headerShown: false,
-              animationEnabled: true,
-              detachPreviousScreen: true,
-              cardStyleInterpolator: ({current}) => ({
-                cardStyle: {
-                  opacity: current.progress,
-                },
-              }),
-            }}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Details" component={DetailsScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </BackgroundProvider>
-    </TamaguiProvider>
+    <StrictMode>
+      <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
+        <BackgroundProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName="Home"
+              screenOptions={{
+                headerShown: false,
+                animationEnabled: true,
+                detachPreviousScreen: true,
+                cardStyleInterpolator: ({current}) => ({
+                  cardStyle: {
+                    opacity: current.progress,
+                  },
+                }),
+              }}>
+              <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Details" component={DetailsScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </BackgroundProvider>
+      </TamaguiProvider>
+    </StrictMode>
   );
 }
 
