@@ -21,7 +21,6 @@ import {
 } from 'tamagui';
 
 // TODO: CommandPalette will either fuzzy search through your projects or run a command
-// - When the user starts typing alphanumeric characters summon the command palette and start a fuzzy search through the projects
 // - When the user presses the up,down or tab keys or clicks on the icon navigate through the command palette list
 // - When the user presses enter on a command run the command
 // - When the user is in command mode show the autocomplete command list
@@ -42,6 +41,7 @@ type CommandPaletteProps = SearchableInputProps & {
   isVisible: boolean;
   commands: SearchSet[];
   onCommandSelected?: (command: SearchSet) => void;
+  wrap?: (children: React.ReactNode) => React.ReactNode;
 };
 
 export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
@@ -90,8 +90,16 @@ export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
         borderRadius={10}
         margin="$0"
         padding="$0"
+        gap="$2"
         alignContent="center"
         justifyContent="center">
+        <YStack
+          alignContent="center"
+          justifyContent="center"
+          margin="$0"
+          paddingLeft="$2">
+          <>{ThemedIcon}</>
+        </YStack>
         <Input
           // @ts-expect-error - types are not exposed on macOS or windows for enableFocusRing
           enableFocusRing={false}
@@ -101,17 +109,11 @@ export const SearchableInput = forwardRef<TextInput, SearchableInputProps>(
           fontSize="$8"
           margin="$0"
           borderWidth="$0"
+          paddingLeft="$0"
           paddingTop="$2"
           onChangeText={handleSearch}
           onBlur={handleBlur}
         />
-        <YStack
-          alignContent="center"
-          justifyContent="center"
-          margin="$0"
-          paddingRight="$3">
-          <>{ThemedIcon}</>
-        </YStack>
       </XStack>
     );
   },
@@ -157,14 +159,16 @@ export default function CommandPalette({
   }, [toggleKeyEvents, visible, inputRef]);
 
   return (
+    // TODO: Implement AnimatePresence, the parent element needs to animate on show/hide, maybe we remove the internal visibility state, and add a callback to the parent
     <AnimatePresence>
       {visible && (
-        <YStack overflow="hidden" padding="$0" margin="$0">
-          <YStack
-            padding="$5"
-            paddingBottom="$0"
-            enterStyle={{y: 0}}
-            exitStyle={{y: -100}}>
+        <YStack
+          overflow="hidden"
+          padding="$0"
+          margin="$0"
+          enterStyle={{y: 0}}
+          exitStyle={{y: -100}}>
+          <YStack padding="$5" paddingBottom="$0">
             <SearchableInput
               ref={inputRef}
               icon={mode === 'command' ? Terminal : ListFilter}
