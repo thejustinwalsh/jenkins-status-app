@@ -6,17 +6,16 @@ import {
   PauseCircle,
   AlertCircle,
 } from '@tamagui/lucide-icons';
+import type {IconProps} from '@tamagui/helpers-icon';
 
 import ListItem from '@app/components/StatusListItem';
 
-import type {IconProps} from '@tamagui/helpers-icon';
-
-type ProjectListStatusProps = {
+export type ProjectListStatusProps = {
   color: string;
   icon: React.NamedExoticComponent<IconProps>;
 };
 
-type ProjectListItemProps = {
+export type ProjectListItemProps = {
   variant?: 'default' | 'progress';
   title: string;
   value?: string | number;

@@ -1,14 +1,14 @@
 import {useCallback, useMemo, useState} from 'react';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {YGroup} from 'tamagui';
+import {PortalProvider, YGroup} from 'tamagui';
 
-import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjects} from '@app/hooks/projects';
-
-import CommandPalette, {type SearchSet} from '@app/components/CommandPalette';
 import {appBridge} from '@app/lib/native';
+import ProjectListItem from '@app/components/ProjectListItem';
+import CommandPalette from '@app/components/CommandPalette';
 
 import type {StackProps} from '@app/navigation/params';
+import type {SearchSet} from '@app/components/SearchableInput';
 
 type Commands = 'add' | 'remove' | 'refresh' | 'settings' | 'help' | 'quit';
 
@@ -19,12 +19,11 @@ type CommandSet = SearchSet & {
 };
 
 const commands: CommandSet[] = [
-  {key: 'add', value: '<b>Add</b> a new project'},
-  {key: 'remove', value: '<b>Remove</b> a project'},
-  {key: 'refresh', value: '<b>Refresh</b> the project list'},
-  {key: 'settings', value: '<b>Settings</b>'},
-  {key: 'help', value: '<b>Help</b>'},
-  {key: 'quit', value: '<b>Quit</b>', windows: '<b>Exit</b>'},
+  {key: 'add', value: 'Add'},
+  {key: 'refresh', value: 'Refresh'},
+  {key: 'settings', value: 'Settings'},
+  {key: 'help', value: 'Help'},
+  {key: 'quit', value: 'Quit', windows: 'Exit'},
 ];
 
 export default function HomeScreen({
@@ -74,39 +73,63 @@ export default function HomeScreen({
     [],
   );
 
+  // TODO: Implement command navigation and list refresh commands
+  const handleCommandSelected = useCallback((command: React.Key) => {
+    switch (command) {
+      case 'add':
+        //navigation.navigate('Add');
+        break;
+      case 'refresh':
+        //appBridge.refresh();
+        break;
+      case 'settings':
+        //navigation.navigate('Settings');
+        break;
+      case 'help':
+        //navigation.navigate('Help');
+        break;
+      case 'quit':
+        appBridge.closeApp();
+        break;
+    }
+  }, []);
+
   return (
-    <YGroup
-      backgroundColor="$background"
-      minWidth={400}
-      minHeight={50}
-      onLayout={event => {
-        const {width, height} = event.nativeEvent.layout;
-        appBridge.resize(width, height);
-      }}>
-      <YGroup.Item>
-        <CommandPalette
-          isVisible={false}
-          terms={searchTerms}
-          commands={commands}
-          onSearchResults={handleSearchResults}
-        />
-      </YGroup.Item>
-      <YGroup.Item>
-        {filteredProjects.map(project => (
-          <ProjectListItem
-            key={project.id}
-            variant={project.variant as any}
-            title={project.name}
-            value={
-              project.variant === 'default'
-                ? project.lastRun
-                : Math.random() * 100
-            }
-            status={project.status as any}
-            onPress={navigateToDetails}
+    <PortalProvider>
+      <YGroup
+        backgroundColor="$background"
+        minWidth={400}
+        minHeight={50}
+        onLayout={event => {
+          const {width, height} = event.nativeEvent.layout;
+          appBridge.resize(width, height);
+        }}>
+        <YGroup.Item>
+          <CommandPalette
+            isVisible={false}
+            terms={searchTerms}
+            commands={commands}
+            onSearchResults={handleSearchResults}
+            onCommandSelected={handleCommandSelected}
           />
-        ))}
-      </YGroup.Item>
-    </YGroup>
+        </YGroup.Item>
+        <YGroup.Item>
+          {filteredProjects.map(project => (
+            <ProjectListItem
+              key={project.id}
+              variant={project.variant as any}
+              title={project.name}
+              value={
+                project.variant === 'default'
+                  ? project.lastRun
+                  : Math.random() * 100
+              }
+              status={project.status as any}
+              onPress={navigateToDetails}
+            />
+          ))}
+        </YGroup.Item>
+      </YGroup>
+    </PortalProvider>
   );
 }
