@@ -6,9 +6,10 @@ import {
   PauseCircle,
   AlertCircle,
 } from '@tamagui/lucide-icons';
-import type {IconProps} from '@tamagui/helpers-icon';
 
 import ListItem from '@app/components/StatusListItem';
+
+import type {IconProps} from '@tamagui/helpers-icon';
 
 export type ProjectListStatusProps = {
   color: string;

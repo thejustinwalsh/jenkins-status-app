@@ -1,13 +1,14 @@
 import React, {useCallback, useImperativeHandle, useMemo, useRef} from 'react';
-import {
+import {Searcher} from 'fast-fuzzy';
+import {Input, XStack, YStack, getFontSize, useGetThemedIcon} from 'tamagui';
+import type {IconProps} from '@tamagui/helpers-icon';
+
+import type {
   LayoutChangeEvent,
   NativeSyntheticEvent,
   TextInput,
   TextInputEndEditingEventData,
 } from 'react-native';
-import {Searcher} from 'fast-fuzzy';
-import {Input, XStack, YStack, getFontSize, useGetThemedIcon} from 'tamagui';
-import {IconProps} from '@tamagui/helpers-icon';
 
 export type SearchSet = {
   key: React.Key;

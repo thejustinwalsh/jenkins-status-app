@@ -1,10 +1,14 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {LayoutChangeEvent, TextInput} from 'react-native';
+import type React from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
+import type {LayoutChangeEvent, TextInput} from 'react-native';
 import {Popover, YStack, Heading} from 'tamagui';
 import {ListFilter, Terminal} from '@tamagui/lucide-icons';
 
-import {KeyEvent, useKeyEvents} from '@app/hooks/keyEvents';
-import SearchableInput, {
+import SearchableInput from '@app/components/SearchableInput';
+import {useKeyEvents} from '@app/hooks/keyEvents';
+
+import type {KeyEvent} from '@app/hooks/keyEvents';
+import type {
   SearchSet,
   SearchableInputProps,
 } from '@app/components/SearchableInput';

@@ -1,7 +1,6 @@
 import React, {StrictMode} from 'react';
 import {
   NavigationContainer,
-  Theme as NavigationContainerTheme,
   DefaultTheme as NavigationContainerDefaultTheme,
 } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -9,11 +8,12 @@ import {TamaguiProvider, useTheme} from 'tamagui';
 
 import config from './tamagui.config';
 
-import type {StackProps} from '@app/navigation/params';
-
 import {appBridge} from '@app/lib/native';
 import HomeScreen from '@app/screens/HomeScreen';
 import DetailsScreen from '@app/screens/DetailsScreen';
+
+import type {Theme as NavigationContainerTheme} from '@react-navigation/native';
+import type {StackProps} from '@app/navigation/params';
 
 const Stack = createStackNavigator<StackProps>();
 
