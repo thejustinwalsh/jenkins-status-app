@@ -2,7 +2,7 @@ import {useAtom} from 'jotai';
 
 import {atomWithStorage} from '@app/lib/storage';
 
-export type Project = {
+export type ProjectSettings = {
   id: string;
   name: string;
   url: string;
@@ -17,7 +17,7 @@ export type Project = {
   };
 };
 
-const debugData: Project[] = [
+const debugData: ProjectSettings[] = [
   {
     id: '1',
     name: 'Project 1',
@@ -60,8 +60,16 @@ const debugData: Project[] = [
 ];
 
 // TODO: remove debug data
-const jobsAtom = atomWithStorage<Project[]>('projects', debugData);
+const settingsAtom = atomWithStorage<ProjectSettings[]>(
+  'project-settings',
+  debugData,
+);
 
-export function useProjects() {
-  return useAtom(jobsAtom);
+export function useProjectSettings() {
+  return useAtom(settingsAtom);
+}
+
+export function useProjectSetting(id: string) {
+  const [projects] = useProjectSettings();
+  return projects.find(p => p.id === id);
 }

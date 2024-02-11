@@ -3,7 +3,7 @@ import {PortalProvider, YGroup} from 'tamagui';
 
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
-import {useProjects} from '@app/hooks/useProjects';
+import {useProjectSettings} from '@app/hooks/useProjectSettings';
 import {appBridge} from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
@@ -29,10 +29,11 @@ const commands: CommandSet[] = [
 export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Home'>) {
-  const [projects] = useProjects();
-  const navigateToDetails = useCallback(() => {
-    navigation.navigate('Details');
-  }, [navigation]);
+  const [projects] = useProjectSettings();
+  const navigateToDetails = useCallback(
+    (id: string) => () => navigation.navigate('Details', {id}),
+    [navigation],
+  );
 
   const debugData = useMemo(
     () =>
@@ -125,7 +126,7 @@ export default function HomeScreen({
                   : Math.random() * 100
               }
               status={project.status as any}
-              onPress={navigateToDetails}
+              onPress={navigateToDetails(project.id)}
             />
           ))}
         </YGroup.Item>
