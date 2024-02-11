@@ -1,8 +1,8 @@
 import {useCallback} from 'react';
 import {Button, Heading, YGroup, YStack} from 'tamagui';
 
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import type {StackProps} from '@app/navigation/params';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 export default function DetailsScreen({
   navigation,

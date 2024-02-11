@@ -1,17 +1,17 @@
-import type React from 'react';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import type {LayoutChangeEvent, TextInput} from 'react-native';
-import {Popover, YStack, Heading} from 'tamagui';
 import {ListFilter, Terminal} from '@tamagui/lucide-icons';
+import {Heading, Popover, YStack} from 'tamagui';
 
 import SearchableInput from '@app/components/SearchableInput';
 import {useKeyEvents} from '@app/hooks/keyEvents';
 
-import type {KeyEvent} from '@app/hooks/keyEvents';
 import type {
   SearchSet,
   SearchableInputProps,
 } from '@app/components/SearchableInput';
+import type {KeyEvent} from '@app/hooks/keyEvents';
+import type React from 'react';
+import type {LayoutChangeEvent, TextInput} from 'react-native';
 
 // TODO: CommandPalette will either fuzzy search through your projects or run a command
 // - When the user presses the up,down or tab keys or clicks on the icon navigate through the command palette list

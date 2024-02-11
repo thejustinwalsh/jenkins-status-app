@@ -1,14 +1,14 @@
 import {useCallback, useMemo, useState} from 'react';
 import {PortalProvider, YGroup} from 'tamagui';
 
+import CommandPalette from '@app/components/CommandPalette';
+import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjects} from '@app/hooks/projects';
 import {appBridge} from '@app/lib/native';
-import ProjectListItem from '@app/components/ProjectListItem';
-import CommandPalette from '@app/components/CommandPalette';
 
-import type {NativeStackScreenProps} from '@react-navigation/native-stack';
-import type {StackProps} from '@app/navigation/params';
 import type {SearchSet} from '@app/components/SearchableInput';
+import type {StackProps} from '@app/navigation/params';
+import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 type Commands = 'add' | 'remove' | 'refresh' | 'settings' | 'help' | 'quit';
 

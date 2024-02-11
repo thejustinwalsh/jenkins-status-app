@@ -1,8 +1,8 @@
+import {MMKV} from 'react-native-mmkv';
 import {
   atomWithStorage as atomWithStorageProxy,
   createJSONStorage,
 } from 'jotai/utils';
-import {MMKV} from 'react-native-mmkv';
 
 export const mmkv = new MMKV();
 

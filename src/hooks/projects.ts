@@ -1,4 +1,5 @@
 import {useAtom} from 'jotai';
+
 import {atomWithStorage} from '@app/lib/storage';
 
 export type Project = {

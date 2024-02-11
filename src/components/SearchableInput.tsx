@@ -1,8 +1,8 @@
 import React, {useCallback, useImperativeHandle, useMemo, useRef} from 'react';
 import {Searcher} from 'fast-fuzzy';
 import {Input, XStack, YStack, getFontSize, useGetThemedIcon} from 'tamagui';
-import type {IconProps} from '@tamagui/helpers-icon';
 
+import type {IconProps} from '@tamagui/helpers-icon';
 import type {
   LayoutChangeEvent,
   NativeSyntheticEvent,

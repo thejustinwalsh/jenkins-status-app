@@ -1,10 +1,10 @@
 import {
-  XCircle,
+  AlertCircle,
   CheckCircle2,
   ChevronRight,
   CircleEllipsis,
   PauseCircle,
-  AlertCircle,
+  XCircle,
 } from '@tamagui/lucide-icons';
 
 import ListItem from '@app/components/StatusListItem';

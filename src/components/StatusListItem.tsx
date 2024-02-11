@@ -1,21 +1,20 @@
 import {forwardRef} from 'react';
-import {
-  ListItemFrame,
-  ListItemText,
-  ListItemSubtitle,
-  themeable,
-  Progress,
-  ListItemTitle,
-} from 'tamagui';
-
 import {getFontSize} from '@tamagui/font-size';
 import {useGetThemedIcon} from '@tamagui/helpers-tamagui';
 import {YStack} from '@tamagui/stacks';
 import {wrapChildrenInText} from '@tamagui/text';
 import {Spacer, getTokens, getVariableValue, useProps} from '@tamagui/web';
+import {
+  ListItemFrame,
+  ListItemSubtitle,
+  ListItemText,
+  ListItemTitle,
+  Progress,
+  themeable,
+} from 'tamagui';
 
-import type {ListItemProps, ProgressProps, TamaguiElement} from 'tamagui';
 import type {PropsWithoutMediaStyles} from '@tamagui/web';
+import type {ListItemProps, ProgressProps, TamaguiElement} from 'tamagui';
 
 type CustomListItemProps = ListItemProps &
   Pick<ProgressProps, 'value' | 'max'> & {

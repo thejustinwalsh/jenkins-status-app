@@ -6,14 +6,13 @@ import {
 import {createStackNavigator} from '@react-navigation/stack';
 import {TamaguiProvider, useTheme} from 'tamagui';
 
+import {appBridge} from '@app/lib/native';
+import DetailsScreen from '@app/screens/DetailsScreen';
+import HomeScreen from '@app/screens/HomeScreen';
 import config from './tamagui.config';
 
-import {appBridge} from '@app/lib/native';
-import HomeScreen from '@app/screens/HomeScreen';
-import DetailsScreen from '@app/screens/DetailsScreen';
-
-import type {Theme as NavigationContainerTheme} from '@react-navigation/native';
 import type {StackProps} from '@app/navigation/params';
+import type {Theme as NavigationContainerTheme} from '@react-navigation/native';
 
 const Stack = createStackNavigator<StackProps>();
 

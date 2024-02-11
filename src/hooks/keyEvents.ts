@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useState} from 'react';
+
 import {appBridge} from '../lib/native/app-bridge';
 
 export type KeyEvent = {
