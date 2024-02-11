@@ -11,5 +11,8 @@
     "Reactotron",
     "tamagui",
     "themeable"
-  ]
+  ],
+  "files.associations": {
+    "macos/**/*.h": "objective-c",
+  },
 }
