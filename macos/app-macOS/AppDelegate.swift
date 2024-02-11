@@ -77,7 +77,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       button.action = #selector(togglePopover(_:))
       
       let icon = ZStack(alignment: .center) {
-        Image(systemName: "infinity.circle.fill")
+        Image(systemName: "mustache.fill")
           .font(.title2)
       }
       let iconView = NSHostingView(rootView: icon)
