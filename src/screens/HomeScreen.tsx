@@ -3,7 +3,7 @@ import {PortalProvider, YGroup} from 'tamagui';
 
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
-import {useProjects} from '@app/hooks/projects';
+import {useProjects} from '@app/hooks/useProjects';
 import {appBridge} from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';

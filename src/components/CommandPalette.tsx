@@ -3,13 +3,13 @@ import {ListFilter, Terminal} from '@tamagui/lucide-icons';
 import {Heading, Popover, YStack} from 'tamagui';
 
 import SearchableInput from '@app/components/SearchableInput';
-import {useKeyEvents} from '@app/hooks/keyEvents';
+import {useKeyEvents} from '@app/hooks/useKeyEvents';
 
 import type {
   SearchSet,
   SearchableInputProps,
 } from '@app/components/SearchableInput';
-import type {KeyEvent} from '@app/hooks/keyEvents';
+import type {KeyEvent} from '@app/hooks/useKeyEvents';
 import type React from 'react';
 import type {LayoutChangeEvent, TextInput} from 'react-native';
 
