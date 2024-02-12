@@ -121,6 +121,7 @@ export default function CommandPalette({
             width={commandPaletteWidth}
             minHeight={100}
             borderWidth="$1"
+            backgroundColor="$color3"
             borderColor="$color9"
             alignItems="stretch">
             <YStack margin="$2" marginLeft="$3" gap="$0" alignItems="stretch">

@@ -70,6 +70,7 @@ const SearchableInput = React.forwardRef<TextInput, SearchableInputProps>(
       <XStack
         borderWidth="$1"
         borderColor="$color10"
+        backgroundColor="$color3"
         borderRadius={10}
         margin="$0"
         padding="$0"
@@ -92,6 +93,7 @@ const SearchableInput = React.forwardRef<TextInput, SearchableInputProps>(
           size="$4"
           fontSize="$8"
           margin="$0"
+          backgroundColor="$color3"
           borderWidth="$0"
           paddingLeft="$0"
           paddingTop="$2"

@@ -9,6 +9,7 @@ import {TamaguiProvider, useTheme} from 'tamagui';
 import {appBridge} from '@app/lib/native';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
+import SettingsScreen from '@app/screens/SettingsScreen';
 import config from './tamagui.config';
 
 import type {StackProps} from '@app/navigation/params';
@@ -61,6 +62,7 @@ function App(): JSX.Element {
               }}>
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Details" component={DetailsScreen} />
+              <Stack.Screen name="Settings" component={SettingsScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </BackgroundProvider>
