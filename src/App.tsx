@@ -50,10 +50,13 @@ function App(): JSX.Element {
           <NavigationContainer>
             <Stack.Navigator
               initialRouteName="Home"
+              detachInactiveScreens
               screenOptions={{
                 headerShown: false,
                 animationEnabled: true,
                 detachPreviousScreen: true,
+                gestureEnabled: false,
+                cardStyle: {flex: 1},
                 cardStyleInterpolator: ({current}) => ({
                   cardStyle: {
                     opacity: current.progress,

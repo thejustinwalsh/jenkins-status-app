@@ -25,7 +25,6 @@ const IconInput = React.forwardRef<Input, IconInputProps>(function IconInput(
     color: iconColor as any,
   });
   const ThemedIcon = getThemedIcon(icon);
-  console.log(size, fontSize, iconSize);
 
   return (
     <XStack
@@ -38,6 +37,8 @@ const IconInput = React.forwardRef<Input, IconInputProps>(function IconInput(
         {ThemedIcon}
       </Label>
       <Input
+        // @ts-expect-error - types are not exposed on macOS or windows for enableFocusRing
+        enableFocusRing={false}
         ref={forwardRef}
         id={id}
         flex={1}

@@ -1,3 +1,4 @@
+import {useCallback, useMemo} from 'react';
 import {useAtom} from 'jotai';
 
 import {atomWithStorage} from '@app/lib/storage';
@@ -70,6 +71,17 @@ export function useProjectSettings() {
 }
 
 export function useProjectSetting(id: string) {
-  const [projects] = useProjectSettings();
-  return projects.find(p => p.id === id);
+  const [projects, setProjects] = useProjectSettings();
+  const project = useMemo(
+    () => projects.find(p => p.id === id)!,
+    [projects, id],
+  );
+
+  const setProject = useCallback(
+    (p: ProjectSettings) =>
+      setProjects([...projects.map(pr => (pr.id === p.id ? p : pr))]),
+    [projects, setProjects],
+  );
+
+  return [project, setProject] as const;
 }

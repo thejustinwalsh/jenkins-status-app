@@ -61,6 +61,7 @@ export default function CommandPalette({
     }
   }, []);
 
+  // TODO: Key events need to be turned off when we leave the page as well
   const toggleKeyEvents = useKeyEvents(handleKeyEvents);
   useEffect(() => {
     toggleKeyEvents(!visible);

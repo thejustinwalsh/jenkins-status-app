@@ -1,6 +1,7 @@
 import {useCallback, useMemo, useState} from 'react';
 import {PortalProvider, YGroup} from 'tamagui';
 
+import AutoSizeStack from '@app/components/AutoSizeStack';
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjectSettings} from '@app/hooks/useProjectSettings';
@@ -97,40 +98,38 @@ export default function HomeScreen({
 
   return (
     <PortalProvider>
-      <YGroup
-        backgroundColor="$background"
+      <AutoSizeStack
         minWidth={400}
         minHeight={50}
-        onLayout={event => {
-          const {width, height} = event.nativeEvent.layout;
-          appBridge.resize(width, height);
-        }}>
-        <YGroup.Item>
-          <CommandPalette
-            isVisible={false}
-            terms={searchTerms}
-            commands={commands}
-            onSearchResults={handleSearchResults}
-            onCommandSelected={handleCommandSelected}
-          />
-        </YGroup.Item>
-        <YGroup.Item>
-          {filteredProjects.map(project => (
-            <ProjectListItem
-              key={project.id}
-              variant={project.variant as any}
-              title={project.name}
-              value={
-                project.variant === 'default'
-                  ? project.lastRun
-                  : Math.random() * 100
-              }
-              status={project.status as any}
-              onPress={navigateToDetails(project.id)}
+        backgroundColor="$background">
+        <YGroup>
+          <YGroup.Item>
+            <CommandPalette
+              isVisible={false}
+              terms={searchTerms}
+              commands={commands}
+              onSearchResults={handleSearchResults}
+              onCommandSelected={handleCommandSelected}
             />
-          ))}
-        </YGroup.Item>
-      </YGroup>
+          </YGroup.Item>
+          <YGroup.Item>
+            {filteredProjects.map(project => (
+              <ProjectListItem
+                key={project.id}
+                variant={project.variant as any}
+                title={project.name}
+                value={
+                  project.variant === 'default'
+                    ? project.lastRun
+                    : Math.random() * 100
+                }
+                status={project.status as any}
+                onPress={navigateToDetails(project.id)}
+              />
+            ))}
+          </YGroup.Item>
+        </YGroup>
+      </AutoSizeStack>
     </PortalProvider>
   );
 }

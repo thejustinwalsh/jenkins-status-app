@@ -42,7 +42,8 @@
     "react-native-svg": "^14.0.0",
     "react-native-web": "^0.19.9",
     "react-native-windows": "^0.73.0-0",
-    "tamagui": "^1.89.19"
+    "tamagui": "^1.89.19",
+    "use-debounce": "^10.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

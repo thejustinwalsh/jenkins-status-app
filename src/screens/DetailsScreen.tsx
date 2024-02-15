@@ -1,9 +1,9 @@
 import {useCallback} from 'react';
-import {Button, Heading, YGroup} from 'tamagui';
+import {Button, Heading, XStack, YGroup, YStack} from 'tamagui';
 
+import AutoSizeStack from '@app/components/AutoSizeStack';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjectSetting} from '@app/hooks/useProjectSettings';
-import {appBridge} from '@app/lib/native';
 
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -12,7 +12,7 @@ export default function DetailsScreen({
   route,
   navigation,
 }: NativeStackScreenProps<StackProps, 'Details'>) {
-  const project = useProjectSetting(route.params.id)!;
+  const [project] = useProjectSetting(route.params.id)!;
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -23,15 +23,8 @@ export default function DetailsScreen({
   // TODO: ProjectListItem needs to be replaced with a component that has back and settings buttons
   // Likely reuse some of the same design and style so that it transitions as a header
   return (
-    <YGroup
-      backgroundColor="$background"
-      minWidth={400}
-      minHeight={50}
-      onLayout={event => {
-        const {width, height} = event.nativeEvent.layout;
-        appBridge.resize(width, height);
-      }}>
-      <YGroup.Item>
+    <AutoSizeStack minWidth={400} minHeight={50} backgroundColor="$background">
+      <YStack padding="$0">
         <ProjectListItem
           key={project.id}
           title={project.name}
@@ -39,13 +32,17 @@ export default function DetailsScreen({
           status={'succeeded'}
           onPress={navigateToSettings}
         />
-      </YGroup.Item>
-      <YGroup.Item>
-        <Heading>Details</Heading>
-      </YGroup.Item>
-      <YGroup.Item>
-        <Button onPress={goBack}>Go Back</Button>
-      </YGroup.Item>
-    </YGroup>
+        <YGroup padding="$4" paddingTop="$0" gap="$4">
+          <YGroup.Item>
+            <XStack justifyContent="center">
+              <Heading size="$16">Details</Heading>
+            </XStack>
+          </YGroup.Item>
+          <YGroup.Item>
+            <Button onPress={goBack}>Go Back</Button>
+          </YGroup.Item>
+        </YGroup>
+      </YStack>
+    </AutoSizeStack>
   );
 }

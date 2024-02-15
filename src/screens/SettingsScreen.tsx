@@ -2,6 +2,7 @@ import {useCallback} from 'react';
 import {Bell, Check, KeySquare, Link, Tag, User} from '@tamagui/lucide-icons';
 import {Checkbox, Label, XStack, YGroup, YStack} from 'tamagui';
 
+import AutoSizeStack from '@app/components/AutoSizeStack';
 import IconInput from '@app/components/IconInput';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjectSetting} from '@app/hooks/useProjectSettings';
@@ -20,14 +21,7 @@ export default function SettingsScreen({
   }, [navigation]);
 
   return (
-    <YStack
-      backgroundColor="$background"
-      minWidth={400}
-      minHeight={50}
-      onLayout={event => {
-        const {width, height} = event.nativeEvent.layout;
-        appBridge.resize(width, height);
-      }}>
+    <AutoSizeStack backgroundColor="$background" minWidth={400} minHeight={300}>
       <YStack padding="$0">
         <ProjectListItem
           key={project.id}
@@ -92,6 +86,8 @@ export default function SettingsScreen({
                 <XStack gap="$2" alignItems="center">
                   <Checkbox
                     id="success"
+                    borderColor="$color6"
+                    backgroundColor="$background"
                     defaultChecked={project.notifications.onSuccess}
                     checked={project.notifications.onSuccess}>
                     <Checkbox.Indicator>
@@ -110,6 +106,8 @@ export default function SettingsScreen({
                 <XStack gap="$2" alignItems="center">
                   <Checkbox
                     id="failure"
+                    borderColor="$color6"
+                    backgroundColor="$background"
                     defaultChecked={project.notifications.onFailure}
                     checked={project.notifications.onFailure}>
                     <Checkbox.Indicator>
@@ -130,6 +128,6 @@ export default function SettingsScreen({
           </YGroup.Item>
         </YGroup>
       </YStack>
-    </YStack>
+    </AutoSizeStack>
   );
 }
