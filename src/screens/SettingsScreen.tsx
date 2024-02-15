@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {useCallback, useEffect, useReducer} from 'react';
 import {Bell, Check, KeySquare, Link, Tag, User} from '@tamagui/lucide-icons';
 import {Checkbox, Label, XStack, YGroup, YStack} from 'tamagui';
 
@@ -6,16 +6,62 @@ import AutoSizeStack from '@app/components/AutoSizeStack';
 import IconInput from '@app/components/IconInput';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useProjectSetting} from '@app/hooks/useProjectSettings';
-import {appBridge} from '@app/lib/native';
 
+import type {ProjectSettings} from '@app/hooks/useProjectSettings';
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
+
+type SettingsAction = {
+  type: 'username' | 'password' | 'url' | 'name' | 'success' | 'failure';
+  value: string | boolean;
+};
+
+function settingsReducer(state: ProjectSettings, action: SettingsAction) {
+  switch (action.type) {
+    case 'username':
+      return {
+        ...state,
+        auth: {...state.auth, username: action.value as string},
+      };
+    case 'password':
+      return {
+        ...state,
+        auth: {...state.auth, password: action.value as string},
+      };
+    case 'url':
+      return {...state, url: action.value as string};
+    case 'name':
+      return {...state, name: action.value as string};
+    case 'success':
+      return {
+        ...state,
+        notifications: {
+          ...state.notifications,
+          onSuccess: action.value as boolean,
+        },
+      };
+    case 'failure':
+      return {
+        ...state,
+        notifications: {
+          ...state.notifications,
+          onFailure: action.value as boolean,
+        },
+      };
+  }
+  console.log(state);
+  return state;
+}
 
 export default function SettingsScreen({
   route,
   navigation,
 }: NativeStackScreenProps<StackProps, 'Settings'>) {
-  const project = useProjectSetting(route.params.id)!;
+  const [initial, setProject] = useProjectSetting(route.params.id);
+  const [project, dispatch] = useReducer(settingsReducer, initial);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- only update when project changes
+  useEffect(() => setProject(project), [project]);
+
   const goBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
@@ -41,6 +87,7 @@ export default function SettingsScreen({
                 borderWidth="$0"
                 icon={User}
                 value={project.auth.username}
+                onChangeText={value => dispatch({type: 'username', value})}
               />
               <IconInput
                 id="password"
@@ -50,6 +97,7 @@ export default function SettingsScreen({
                 borderWidth="$0"
                 icon={KeySquare}
                 value={project.auth.password}
+                onChangeText={value => dispatch({type: 'password', value})}
               />
             </XStack>
           </YGroup.Item>
@@ -63,6 +111,7 @@ export default function SettingsScreen({
                 borderWidth="$0"
                 icon={Link}
                 value={project.url}
+                onChangeText={value => dispatch({type: 'url', value})}
               />
             </XStack>
           </YGroup.Item>
@@ -76,6 +125,7 @@ export default function SettingsScreen({
                 borderWidth="$0"
                 icon={Tag}
                 value={project.name}
+                onChangeText={value => dispatch({type: 'name', value})}
               />
             </XStack>
           </YGroup.Item>
@@ -89,7 +139,10 @@ export default function SettingsScreen({
                     borderColor="$color6"
                     backgroundColor="$background"
                     defaultChecked={project.notifications.onSuccess}
-                    checked={project.notifications.onSuccess}>
+                    checked={project.notifications.onSuccess}
+                    onCheckedChange={value =>
+                      dispatch({type: 'success', value: value.valueOf()})
+                    }>
                     <Checkbox.Indicator>
                       <Check color={'$green9'} />
                     </Checkbox.Indicator>
@@ -109,7 +162,10 @@ export default function SettingsScreen({
                     borderColor="$color6"
                     backgroundColor="$background"
                     defaultChecked={project.notifications.onFailure}
-                    checked={project.notifications.onFailure}>
+                    checked={project.notifications.onFailure}
+                    onCheckedChange={value =>
+                      dispatch({type: 'failure', value: value.valueOf()})
+                    }>
                     <Checkbox.Indicator>
                       <Check color={'$red9'} />
                     </Checkbox.Indicator>
