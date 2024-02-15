@@ -11,33 +11,36 @@ import type {ProjectSettings} from '@app/hooks/useProjectSettings';
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
-type SettingsAction = {
-  type: 'username' | 'password' | 'url' | 'name' | 'success' | 'failure';
-  value: string | boolean;
-};
+type SettingsAction =
+  | {type: 'username'; value: string}
+  | {type: 'password'; value: string}
+  | {type: 'url'; value: string}
+  | {type: 'name'; value: string}
+  | {type: 'success'; value: boolean}
+  | {type: 'failure'; value: boolean};
 
 function settingsReducer(state: ProjectSettings, action: SettingsAction) {
   switch (action.type) {
     case 'username':
       return {
         ...state,
-        auth: {...state.auth, username: action.value as string},
+        auth: {...state.auth, username: action.value},
       };
     case 'password':
       return {
         ...state,
-        auth: {...state.auth, password: action.value as string},
+        auth: {...state.auth, password: action.value},
       };
     case 'url':
-      return {...state, url: action.value as string};
+      return {...state, url: action.value};
     case 'name':
-      return {...state, name: action.value as string};
+      return {...state, name: action.value};
     case 'success':
       return {
         ...state,
         notifications: {
           ...state.notifications,
-          onSuccess: action.value as boolean,
+          onSuccess: action.value,
         },
       };
     case 'failure':
@@ -45,11 +48,10 @@ function settingsReducer(state: ProjectSettings, action: SettingsAction) {
         ...state,
         notifications: {
           ...state.notifications,
-          onFailure: action.value as boolean,
+          onFailure: action.value,
         },
       };
   }
-  console.log(state);
   return state;
 }
 
@@ -141,7 +143,10 @@ export default function SettingsScreen({
                     defaultChecked={project.notifications.onSuccess}
                     checked={project.notifications.onSuccess}
                     onCheckedChange={value =>
-                      dispatch({type: 'success', value: value.valueOf()})
+                      dispatch({
+                        type: 'success',
+                        value: value.valueOf() === true ? true : false,
+                      })
                     }>
                     <Checkbox.Indicator>
                       <Check color={'$green9'} />
@@ -164,7 +169,10 @@ export default function SettingsScreen({
                     defaultChecked={project.notifications.onFailure}
                     checked={project.notifications.onFailure}
                     onCheckedChange={value =>
-                      dispatch({type: 'failure', value: value.valueOf()})
+                      dispatch({
+                        type: 'failure',
+                        value: value.valueOf() === true ? true : false,
+                      })
                     }>
                     <Checkbox.Indicator>
                       <Check color={'$red9'} />
