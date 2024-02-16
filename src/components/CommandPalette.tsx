@@ -3,13 +3,11 @@ import {ListFilter, Terminal} from '@tamagui/lucide-icons';
 import {Heading, Popover, YStack} from 'tamagui';
 
 import SearchableInput from '@app/components/SearchableInput';
-import {useKeyEvents} from '@app/hooks/useKeyEvents';
 
 import type {
   SearchSet,
   SearchableInputProps,
 } from '@app/components/SearchableInput';
-import type {KeyEvent} from '@app/hooks/useKeyEvents';
 import type React from 'react';
 import type {LayoutChangeEvent, TextInput} from 'react-native';
 
@@ -22,7 +20,9 @@ import type {LayoutChangeEvent, TextInput} from 'react-native';
 export type CommandPaletteProps = SearchableInputProps & {
   isVisible: boolean;
   commands: SearchSet[];
+  mode?: 'search' | 'command';
   onCommandSelected?: (command: React.Key) => void;
+  onClosed?: () => void;
   wrap?: (children: React.ReactNode) => React.ReactNode;
 };
 
@@ -30,45 +30,26 @@ export default function CommandPalette({
   isVisible,
   terms,
   commands,
+  mode = 'search',
   onSearchResults,
   onCommandSelected,
+  onClosed,
 }: CommandPaletteProps) {
   const ref = useRef<TextInput>(null);
   const [searchResults, setSearchResults] = useState<SearchSet[]>([]);
-  const [mode, setMode] = useState<'search' | 'command'>('search');
   const [commandPaletteWidth, setCommandPaletteWidth] = useState<number>(300);
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(isVisible);
-  useEffect(() => setVisible(isVisible), [isVisible]);
 
-  const handleBlur = useCallback(() => {
-    setVisible(false);
-    setPopoverOpen(false);
-  }, []);
-
-  const handleKeyEvents = useCallback((event: KeyEvent) => {
-    // Enter - TODO: macOS -> JS keyCode
-    if (event.keyCode === 36) {
-      setMode('command');
-      setVisible(true);
-    }
-    // Esc - TODO: macOS -> JS keyCode
-    // TODO: the key system is going to capture the key, and make users type it twice when summoning the palette
-    // TODO: we will need to capture the key in native, and inject it into the command palette for a smooth experience
-    else if (event.keyCode !== 53) {
-      setMode('search');
-      setVisible(true);
-    }
-  }, []);
-
-  // TODO: Key events need to be turned off when we leave the page as well
-  const toggleKeyEvents = useKeyEvents(handleKeyEvents);
   useEffect(() => {
-    toggleKeyEvents(!visible);
-    if (visible && ref.current?.isFocused() === false) {
+    if (isVisible && ref.current?.isFocused() === false) {
       setTimeout(() => ref.current?.focus(), 1);
     }
-  }, [toggleKeyEvents, visible, ref]);
+  }, [isVisible, ref]);
+
+  const handleBlur = useCallback(() => {
+    setPopoverOpen(false);
+    onClosed?.();
+  }, [onClosed]);
 
   const handleSearchResults = useCallback(
     (results: SearchSet[]) => {
@@ -101,7 +82,7 @@ export default function CommandPalette({
   return (
     // TODO: Implement AnimatePresence, the parent element needs to animate on show/hide, maybe we remove the internal visibility state, and add a callback to the parent
     <>
-      {visible && (
+      {isVisible && (
         <Popover open={popoverOpen} placement="bottom">
           <Popover.Anchor overflow="hidden" padding="$0" margin="$0">
             <YStack padding="$5" paddingBottom="$0">

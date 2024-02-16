@@ -7,14 +7,17 @@ export type KeyEvent = {
   keyCode: number;
 };
 
-export function useKeyEvents(onKeyEvent: (event: KeyEvent) => void) {
-  const [isActive, setIsActive] = useState(true);
+export function useKeyEvents(
+  onKeyEvent: (event: KeyEvent) => void,
+  isActive = true,
+) {
+  const [active, setActive] = useState(isActive);
   useEffect(() => {
-    appBridge.consumeKeys(isActive);
+    appBridge.consumeKeys(active);
     const keyDownListener = appBridge.addListener(
       'keyDown',
       (event: KeyEvent) => {
-        if (isActive) {
+        if (active) {
           onKeyEvent(event);
         }
       },
@@ -23,11 +26,11 @@ export function useKeyEvents(onKeyEvent: (event: KeyEvent) => void) {
     return () => {
       keyDownListener.remove();
     };
-  }, [isActive, onKeyEvent]);
+  }, [active, onKeyEvent]);
 
-  const toggle = useCallback((active: boolean) => {
-    setIsActive(active);
-    appBridge.consumeKeys(active);
+  const toggle = useCallback((state: boolean) => {
+    setActive(state);
+    appBridge.consumeKeys(state);
   }, []);
 
   return toggle;

@@ -1,13 +1,16 @@
-import {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import {PortalProvider, YGroup} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
+import {useKeyEvents} from '@app/hooks/useKeyEvents';
 import {useProjectSettings} from '@app/hooks/useProjectSettings';
 import {appBridge} from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
+import type {KeyEvent} from '@app/hooks/useKeyEvents';
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -31,9 +34,42 @@ export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Home'>) {
   const [projects] = useProjectSettings();
+  const [showCommandPalette, setShowCommandPalette] = useState<boolean>(false);
+  const [commandPaletteMode, setCommandPaletteMode] = useState<
+    'search' | 'command'
+  >('search');
+
   const navigateToDetails = useCallback(
     (id: string) => () => navigation.navigate('Details', {id}),
     [navigation],
+  );
+
+  const handleKeyEvents = useCallback((event: KeyEvent) => {
+    // Enter - TODO: macOS -> JS keyCode
+    if (event.keyCode === 36) {
+      setCommandPaletteMode('command');
+      setShowCommandPalette(true);
+    }
+    // Esc - TODO: macOS -> JS keyCode
+    // TODO: the key system is going to capture the key, and make users type it twice when summoning the palette
+    // TODO: we will need to capture the key in native, and inject it into the command palette for a smooth experience
+    else if (event.keyCode !== 53) {
+      setCommandPaletteMode('search');
+      setShowCommandPalette(true);
+    }
+  }, []);
+
+  const toggleKeyEvents = useKeyEvents(handleKeyEvents, false);
+  useFocusEffect(
+    useCallback(() => {
+      toggleKeyEvents(true);
+      return () => toggleKeyEvents(false);
+    }, [toggleKeyEvents]),
+  );
+
+  useEffect(
+    () => toggleKeyEvents(!showCommandPalette),
+    [toggleKeyEvents, showCommandPalette],
   );
 
   const debugData = useMemo(
@@ -96,6 +132,11 @@ export default function HomeScreen({
     }
   }, []);
 
+  const handleCommandPaletteClosed = useCallback(() => {
+    setShowCommandPalette(false);
+    toggleKeyEvents(true);
+  }, [toggleKeyEvents]);
+
   return (
     <PortalProvider>
       <AutoSizeStack
@@ -105,11 +146,13 @@ export default function HomeScreen({
         <YGroup>
           <YGroup.Item>
             <CommandPalette
-              isVisible={false}
+              isVisible={showCommandPalette}
               terms={searchTerms}
               commands={commands}
+              mode={commandPaletteMode}
               onSearchResults={handleSearchResults}
               onCommandSelected={handleCommandSelected}
+              onClosed={handleCommandPaletteClosed}
             />
           </YGroup.Item>
           <YGroup.Item>
