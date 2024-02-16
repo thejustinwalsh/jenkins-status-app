@@ -8251,6 +8251,11 @@ react-is@^17.0.1:
   resolved "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-itertools@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/react-itertools/-/react-itertools-0.0.6.tgz#687922f1d54433aec192d4253880d6892d5c2e38"
+  integrity sha512-BXb4vz+QHBXDAOKK7UNd/6N6LlQzRt9y29j7y+4A9etYCE5dBFVOkFvLkGBkGfgr9I6Na03p4yky3XEG8oYB/g==
+
 react-native-macos@^0.73.0-0:
   version "0.73.13"
   resolved "https://registry.yarnpkg.com/react-native-macos/-/react-native-macos-0.73.13.tgz#49afee298dfbe45d4294917675bf1247e4d24ce4"

@@ -33,6 +33,7 @@
     "fast-fuzzy": "^1.12.0",
     "jotai": "^2.6.4",
     "react": "18.2.0",
+    "react-itertools": "^0.0.6",
     "react-native": "0.73.3",
     "react-native-macos": "^0.73.0-0",
     "react-native-mmkv": "^2.11.0",
