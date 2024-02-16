@@ -69,7 +69,6 @@ export default function FocusGroup({initialFocus, children}: FocusGroupProps) {
       if (!wasPressed) {
         const target = cachedFocus[index].ref.current;
         if (target) {
-          console.log(target);
           target.setSelection(0, 0);
         }
         setFocusedIndex((index + 1) % sortedKeys.length);
@@ -95,7 +94,6 @@ export default function FocusGroup({initialFocus, children}: FocusGroupProps) {
   }, [initialFocus]);
 
   useEffect(() => {
-    console.log('focusedIndex', focusedIndex, cachedFocus[focusedIndex]);
     cachedFocus[focusedIndex]?.ref?.current?.focus();
   }, [cachedFocus, focusedIndex]);
 
