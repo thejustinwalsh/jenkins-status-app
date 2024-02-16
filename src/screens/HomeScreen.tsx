@@ -38,6 +38,7 @@ export default function HomeScreen({
   const [commandPaletteMode, setCommandPaletteMode] = useState<
     'search' | 'command'
   >('search');
+  const [snapLayout, setSnapLayout] = useState<boolean>(true);
 
   const navigateToDetails = useCallback(
     (id: string) => () => navigation.navigate('Details', {id}),
@@ -49,6 +50,7 @@ export default function HomeScreen({
     if (event.keyCode === 36) {
       setCommandPaletteMode('command');
       setShowCommandPalette(true);
+      setSnapLayout(false);
     }
     // Esc - TODO: macOS -> JS keyCode
     // TODO: the key system is going to capture the key, and make users type it twice when summoning the palette
@@ -56,6 +58,7 @@ export default function HomeScreen({
     else if (event.keyCode !== 53) {
       setCommandPaletteMode('search');
       setShowCommandPalette(true);
+      setSnapLayout(false);
     }
   }, []);
 
@@ -63,7 +66,10 @@ export default function HomeScreen({
   useFocusEffect(
     useCallback(() => {
       toggleKeyEvents(true);
-      return () => toggleKeyEvents(false);
+      return () => {
+        toggleKeyEvents(false);
+        setShowCommandPalette(false);
+      };
     }, [toggleKeyEvents]),
   );
 
@@ -140,6 +146,7 @@ export default function HomeScreen({
   return (
     <PortalProvider>
       <AutoSizeStack
+        snap={snapLayout}
         minWidth={400}
         minHeight={50}
         backgroundColor="$background">

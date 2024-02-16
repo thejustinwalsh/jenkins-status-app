@@ -23,7 +23,7 @@ export default function DetailsScreen({
   // TODO: ProjectListItem needs to be replaced with a component that has back and settings buttons
   // Likely reuse some of the same design and style so that it transitions as a header
   return (
-    <AutoSizeStack minWidth={400} minHeight={50} backgroundColor="$background">
+    <AutoSizeStack minWidth={400} minHeight={200} backgroundColor="$background">
       <YStack padding="$0">
         <ProjectListItem
           key={project.id}

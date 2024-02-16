@@ -1,36 +1,52 @@
 import React, {useCallback, useLayoutEffect, useState} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import {YStack} from 'tamagui';
+import {useDebouncedCallback} from 'use-debounce';
 
 import {appBridge} from '@app/lib/native';
 
-import type {LayoutChangeEvent} from 'react-native';
+import type {LayoutChangeEvent, LayoutRectangle} from 'react-native';
 
 export type AutoSizeStackProps = {
   children?: React.ReactNode;
+  snap?: boolean;
 } & React.ComponentProps<typeof YStack>;
 
-// TODO: React Navigation animations look a little jank, and the component get's multiple layout events causing jitter
-// Maybe we need to store the layout rect of the previous screen and use it as the starting size for the next screen
 const AutoSizeStack = React.forwardRef<typeof YStack, AutoSizeStackProps>(
   function AutoSizeStack(
-    {children, minHeight, minWidth, onLayout, ...props},
+    {children, snap = true, minHeight, minWidth, onLayout, ...props},
     forwardedRef,
   ) {
     const isFocused = useIsFocused();
-
     const [width, setWidth] = useState<number>(0);
     const [height, setHeight] = useState<number>(0);
 
+    // Calculate the largest layout event and update state for the useLayoutEffect
     const handleLayout = useCallback(
+      ({width: w, height: h}: LayoutRectangle) => {
+        if (snap) {
+          setWidth(Math.max(width, Math.max(w, (minWidth || 0) as number)));
+          setHeight(Math.max(height, Math.max(h, (minHeight || 0) as number)));
+        } else {
+          setWidth(Math.max(w, (minWidth || 0) as number));
+          setHeight(Math.max(h, (minHeight || 0) as number));
+        }
+      },
+      [height, minHeight, minWidth, snap, width],
+    );
+
+    // Debounce spammed layout events
+    const handleDebouncedLayout = useDebouncedCallback(handleLayout, 30, {
+      trailing: true,
+    });
+
+    // Destructure native events and call the debounced layout handler
+    const proxyOnLayout = useCallback(
       (event: LayoutChangeEvent) => {
-        const {width: w, height: h} = event.nativeEvent.layout;
-        setWidth(Math.max(w, (minWidth || 0) as number));
-        setHeight(Math.max(h, (minHeight || 0) as number));
-        appBridge.resize(width, height);
+        handleDebouncedLayout(event.nativeEvent.layout);
         onLayout?.(event);
       },
-      [height, minHeight, minWidth, onLayout, width],
+      [handleDebouncedLayout, onLayout],
     );
 
     useLayoutEffect(() => {
@@ -40,7 +56,12 @@ const AutoSizeStack = React.forwardRef<typeof YStack, AutoSizeStackProps>(
     }, [width, height, isFocused]);
 
     return (
-      <YStack ref={forwardedRef} {...props} onLayout={handleLayout}>
+      <YStack
+        ref={forwardedRef}
+        minWidth={minWidth}
+        minHeight={minHeight}
+        {...props}
+        onLayout={proxyOnLayout}>
         {children}
       </YStack>
     );

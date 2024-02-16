@@ -70,7 +70,7 @@ export default function SettingsScreen({
   }, [navigation]);
 
   return (
-    <AutoSizeStack backgroundColor="$background" minWidth={400} minHeight={300}>
+    <AutoSizeStack backgroundColor="$background" minWidth={400} minHeight={200}>
       <YStack padding="$0">
         <ProjectListItem
           key={project.id}
