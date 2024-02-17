@@ -4,9 +4,12 @@ import {
   DefaultTheme as NavigationContainerDefaultTheme,
 } from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {QueryClientProvider} from '@tanstack/react-query';
 import {TamaguiProvider, useTheme} from 'tamagui';
 
-import {appBridge} from '@app/lib/native';
+import '@app/lib/intl';
+import appBridge from '@app/lib/native';
+import queryClient from '@app/lib/query';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
@@ -45,31 +48,33 @@ function BackgroundProvider({children}: {children: React.ReactNode}) {
 function App(): JSX.Element {
   return (
     <StrictMode>
-      <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
-        <BackgroundProvider>
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName="Home"
-              detachInactiveScreens
-              screenOptions={{
-                headerShown: false,
-                animationEnabled: true,
-                detachPreviousScreen: true,
-                gestureEnabled: false,
-                cardStyle: {flex: 1},
-                cardStyleInterpolator: ({current}) => ({
-                  cardStyle: {
-                    opacity: current.progress,
-                  },
-                }),
-              }}>
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Details" component={DetailsScreen} />
-              <Stack.Screen name="Settings" component={SettingsScreen} />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </BackgroundProvider>
-      </TamaguiProvider>
+      <QueryClientProvider client={queryClient}>
+        <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
+          <BackgroundProvider>
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName="Home"
+                detachInactiveScreens
+                screenOptions={{
+                  headerShown: false,
+                  animationEnabled: true,
+                  detachPreviousScreen: true,
+                  gestureEnabled: false,
+                  cardStyle: {flex: 1},
+                  cardStyleInterpolator: ({current}) => ({
+                    cardStyle: {
+                      opacity: current.progress,
+                    },
+                  }),
+                }}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Details" component={DetailsScreen} />
+                <Stack.Screen name="Settings" component={SettingsScreen} />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </BackgroundProvider>
+        </TamaguiProvider>
+      </QueryClientProvider>
     </StrictMode>
   );
 }

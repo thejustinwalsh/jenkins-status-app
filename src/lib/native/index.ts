@@ -1,1 +1,2 @@
-export * from './app-bridge';
+import {appBridge} from './app-bridge';
+export default appBridge;

@@ -12,6 +12,7 @@
     "Podfile",
     "Reactotron",
     "tamagui",
+    "tanstack",
     "themeable"
   ],
   "files.associations": {

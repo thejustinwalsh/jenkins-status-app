@@ -7,7 +7,7 @@ import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useKeyEvents} from '@app/hooks/useKeyEvents';
 import {useProjectSettings} from '@app/hooks/useProjectSettings';
-import {appBridge} from '@app/lib/native';
+import appBridge from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
 import type {KeyEvent} from '@app/hooks/useKeyEvents';
