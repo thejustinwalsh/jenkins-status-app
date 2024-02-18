@@ -13,7 +13,8 @@
     "Reactotron",
     "tamagui",
     "tanstack",
-    "themeable"
+    "themeable",
+    "yaireo"
   ],
   "files.associations": {
     "macos/**/*.h": "objective-c",

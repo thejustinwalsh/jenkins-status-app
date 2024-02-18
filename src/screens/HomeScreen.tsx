@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import RelativeTime from '@yaireo/relative-time';
 import {PortalProvider, YGroup} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
@@ -8,7 +7,7 @@ import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useKeyEvents} from '@app/hooks/useKeyEvents';
 import {useProjectSettings} from '@app/hooks/useProjectSettings';
-import {useProjectStatus} from '@app/hooks/useProjectStatus';
+import {useProjectInfo} from '@app/hooks/useProjectStatus';
 import appBridge from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
@@ -80,43 +79,7 @@ export default function HomeScreen({
     [toggleKeyEvents, showCommandPalette],
   );
 
-  const {projects, builds} = useProjectStatus();
-  const projectsMap = useMemo(
-    () => new Map(projects.map(p => [p.id, p])),
-    [projects],
-  );
-  const buildsMap = useMemo(
-    () => new Map(builds.map(b => [b.number, b])),
-    [builds],
-  );
-
-  const status = useMemo(
-    () =>
-      settings.map(project => {
-        const p = projectsMap.get(project.id)!;
-        const b = buildsMap.get(p.lastBuild.number)!;
-
-        const s = b.inProgress
-          ? 'inProgress'
-          : (() => {
-              if (p.lastBuild.number === p.lastSuccessfulBuild.number) {
-                return 'succeeded';
-              } else if (p.lastBuild.number === p.lastFailedBuild.number) {
-                return 'failed';
-              }
-              return b.building ? 'pending' : 'canceled';
-            })();
-
-        return {
-          id: project.id,
-          name: project.name,
-          variant: b.inProgress ? 'progress' : 'default',
-          lastRun: new RelativeTime().from(new Date(b.timestamp)),
-          status: s,
-        };
-      }),
-    [buildsMap, projectsMap, settings],
-  );
+  const [infos] = useProjectInfo();
 
   const searchTerms = useMemo(
     () =>
@@ -132,9 +95,9 @@ export default function HomeScreen({
   const filteredProjects = useMemo(
     () =>
       filter.length > 0
-        ? status.filter(p => filter.find(f => f.key === p.id))
-        : status,
-    [status, filter],
+        ? infos.filter(i => filter.find(f => f.key === i.id))
+        : infos,
+    [infos, filter],
   );
 
   const handleSearchResults = useCallback(
