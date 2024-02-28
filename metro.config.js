@@ -4,17 +4,42 @@
  *
  * @format
  */
-const fs = require('fs');
-const path = require('path');
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const fs = require('fs');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
+const path = require('path');
 
 const rnwPath = fs.realpathSync(
   path.resolve(require.resolve('react-native-windows/package.json'), '..'),
 );
 
+function shimResolver(resolver) {
+  return (context, moduleName, platform) => {
+    if (moduleName.startsWith('@dev-plugins')) {
+      return context.expoDevToolsHost === true
+        ? undefined
+        : {
+            filePath: path.resolve(
+              __dirname,
+              'src',
+              'shims',
+              moduleName,
+              'index.js',
+            ),
+            type: 'sourceFile',
+          };
+    }
+
+    return (
+      resolver?.(context, moduleName, platform) ??
+      context.resolveRequest(context, moduleName, platform)
+    );
+  };
+}
+
 module.exports = mergeConfig(getDefaultConfig(__dirname), {
   resolver: {
+    resolveRequest: shimResolver(),
     blockList: exclusionList([
       // This stops "react-native run-windows" from causing the metro server to crash if its already running
       new RegExp(
