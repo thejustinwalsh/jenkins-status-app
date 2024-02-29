@@ -62,6 +62,7 @@ function fetchProjectStatus(
     headers: {
       Authorization: `Basic ${btoa(`${username}:${password}`)}`,
     },
+    mode: 'no-cors',
   }).then(res => res.json() as Promise<ProjectStatus>);
 }
 
@@ -144,45 +145,54 @@ export function useProjectStatus(): {
     ),
   });
 
+  const awaitingProjectData = projectsQuery.reduce(
+    (acc, {isPlaceholderData}) => acc || isPlaceholderData,
+    false,
+  );
+
   // Fetch the status of the last build for each project
   const buildQueries = useQueries({
-    queries: projectsQuery.map(
-      ({data: project}): UseQueryOptions<BuildStatus> => {
-        return {
-          enabled: !!project && project.lastBuild.number > 0,
-          queryKey: ['project', project?.id, project?.lastBuild.number],
-          refetchInterval: REFETCH,
-          refetchIntervalInBackground: true,
-          // This should not run until the query keys are defined
-          queryFn: () =>
-            fetchBuildStatus(
-              settingsMap.get(project!.id)!.url,
-              settingsMap.get(project!.id)!.auth,
-              project!.lastBuild.number,
-            ),
-          placeholderData: (prev?: BuildStatus) => ({
-            id: prev?.id ?? '0',
-            number: prev?.number ?? project?.lastBuild.number ?? 0,
-            building: prev?.building ?? false,
-            duration: prev?.duration ?? 0,
-            estimatedDuration: prev?.estimatedDuration ?? 0,
-            inProgress: prev?.inProgress ?? false,
-            result: prev?.result ?? '',
-            timestamp: prev?.timestamp ?? 0,
-          }),
-          select: (data: BuildStatus): BuildStatus => ({
-            id: data.id,
-            number: data.number,
-            building: data.building,
-            duration: data.duration,
-            estimatedDuration: data.estimatedDuration,
-            inProgress: data.inProgress,
-            result: data.result,
-            timestamp: data.timestamp,
-          }),
-        };
-      },
-    ),
+    queries: !awaitingProjectData
+      ? projectsQuery.map(({data: project}): UseQueryOptions<BuildStatus> => {
+          if (!project?.id && !project?.lastBuild?.number) {
+            console.log('Project or build number is missing!!!');
+            console.log('projectsQuery', projectsQuery);
+            console.log('settings', settings);
+          }
+          return {
+            queryKey: ['project', project?.id, project?.lastBuild.number],
+            refetchInterval: REFETCH,
+            refetchIntervalInBackground: true,
+            // This should not run until the query keys are defined
+            queryFn: () =>
+              fetchBuildStatus(
+                settingsMap.get(project!.id)!.url,
+                settingsMap.get(project!.id)!.auth,
+                project!.lastBuild.number,
+              ),
+            placeholderData: (prev?: BuildStatus) => ({
+              id: prev?.id ?? '0',
+              number: prev?.number ?? project?.lastBuild.number ?? 0,
+              building: prev?.building ?? false,
+              duration: prev?.duration ?? 0,
+              estimatedDuration: prev?.estimatedDuration ?? 0,
+              inProgress: prev?.inProgress ?? false,
+              result: prev?.result ?? '',
+              timestamp: prev?.timestamp ?? 0,
+            }),
+            select: (data: BuildStatus): BuildStatus => ({
+              id: data.id,
+              number: data.number,
+              building: data.building,
+              duration: data.duration,
+              estimatedDuration: data.estimatedDuration,
+              inProgress: data.inProgress,
+              result: data.result,
+              timestamp: data.timestamp,
+            }),
+          };
+        })
+      : [],
   });
 
   return useMemo(
@@ -236,9 +246,9 @@ export function useProjectInfo() {
     () =>
       projects.map(project => {
         const p = projectsMap.get(project.id)!;
-        const b = buildsMap.get(p.lastBuild.number)!;
+        const b = buildsMap.get(p.lastBuild.number);
 
-        const s = b.inProgress
+        const s = b?.inProgress
           ? 'inProgress'
           : (() => {
               if (p.lastBuild.number === p.lastSuccessfulBuild.number) {
@@ -246,37 +256,31 @@ export function useProjectInfo() {
               } else if (p.lastBuild.number === p.lastFailedBuild.number) {
                 return 'failed';
               }
-              return b.building ? 'pending' : 'canceled';
+              return !b || b.building ? 'pending' : 'canceled';
             })();
 
         return {
           id: project.id,
           name: project.name,
-          variant: b.inProgress ? 'progress' : 'default',
-          lastRun: new RelativeTime().from(new Date(b.timestamp)),
+          variant: b?.inProgress ? 'progress' : 'default',
+          lastRun: new RelativeTime().from(
+            new Date((b?.timestamp ?? 0) + (b?.duration ?? 0)),
+          ),
           status: s,
         };
       }),
     [buildsMap, projects, projectsMap],
   );
 
-  return [info, projects, builds] as const;
+  return [info, projectsMap, buildsMap] as const;
 }
 
 export function useProjectInfoById(id: string) {
   const [infos, projects, builds] = useProjectInfo();
   const infosMap = useMemo(() => new Map(infos.map(i => [i.id, i])), [infos]);
-  const projectsMap = useMemo(
-    () => new Map(projects.map(p => [p.id, p])),
-    [projects],
-  );
-  const buildsMap = useMemo(
-    () => new Map(builds.map(b => [b.number, b])),
-    [builds],
-  );
 
-  const project = projectsMap.get(id)!;
-  const build = buildsMap.get(project.lastBuild.number)!;
+  const project = projects.get(id)!;
+  const build = builds.get(project.lastBuild.number)!;
   const info = infosMap.get(id)!;
 
   return [info, project, build] as const;

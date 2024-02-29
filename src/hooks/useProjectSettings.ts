@@ -18,54 +18,9 @@ export type ProjectSettings = {
   };
 };
 
-const debugData: ProjectSettings[] = [
-  {
-    id: '1',
-    name: 'Project 1',
-    url: 'https://example.com',
-    auth: {
-      username: 'user',
-      password: 'pass',
-    },
-    notifications: {
-      onSuccess: false,
-      onFailure: true,
-    },
-  },
-  {
-    id: '2',
-    name: 'Project 2',
-    url: 'https://example.com',
-    auth: {
-      username: 'user',
-      password: 'pass',
-    },
-    notifications: {
-      onSuccess: true,
-      onFailure: true,
-    },
-  },
-  {
-    id: '3',
-    name: 'Project 3',
-    url: 'https://example.com',
-    auth: {
-      username: 'user',
-      password: 'pass',
-    },
-    notifications: {
-      onSuccess: true,
-      onFailure: false,
-    },
-  },
-];
+const settingsAtom = atomWithStorage<ProjectSettings[]>('project-settings', []);
 
-// TODO: remove debug data
-const settingsAtom = atomWithStorage<ProjectSettings[]>(
-  'project-settings',
-  debugData,
-);
-
+// TODO: Without default projects in storage, we should provide a way to add them
 export function useProjectSettings() {
   return useAtom(settingsAtom);
 }
