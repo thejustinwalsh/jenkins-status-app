@@ -3,6 +3,8 @@ import {StrictMode} from 'react';
 import {useReactQueryDevTools} from '@dev-plugins/react-query';
 import {createStackNavigator} from '@react-navigation/stack';
 import {QueryClientProvider} from '@tanstack/react-query';
+// @ts-expect-error
+import XHRInterceptor from 'react-native/Libraries/Network/XHRInterceptor';
 import {TamaguiProvider} from 'tamagui';
 
 import '@app/lib/intl';
@@ -16,6 +18,16 @@ import config from './tamagui.config';
 
 import type {StackProps} from '@app/navigation/params';
 import type {StackNavigationOptions} from '@react-navigation/stack';
+
+// TODO: Expo Dev-Plugins for fetch
+if (__DEV__) {
+  XHRInterceptor.enableInterception();
+  XHRInterceptor.setResponseCallback((...obj: unknown[]) => {
+    if (obj[0] !== 200) {
+      console.warn('fetch:', JSON.stringify(obj, null, 2));
+    }
+  });
+}
 
 const Stack = createStackNavigator<StackProps>();
 const screenOptions: StackNavigationOptions = {
