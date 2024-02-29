@@ -11,6 +11,8 @@ import type {UseQueryOptions} from '@tanstack/react-query';
 export type ProjectStatus = {
   id: string;
   name: string;
+  fullDisplayName: string;
+  description: string;
   healthReport: HealthReport[];
   inQueue: boolean;
   lastBuild: Build;
@@ -97,6 +99,8 @@ export function useProjectStatus(): {
         placeholderData: (prev?: ProjectStatus) => ({
           id: prev?.id ?? id,
           name: prev?.name ?? name,
+          fullDisplayName: prev?.fullDisplayName ?? '',
+          description: prev?.description ?? '',
           healthReport: prev?.healthReport ?? [],
           inQueue: prev?.inQueue ?? false,
           lastBuild: prev?.lastBuild ?? {number: 0, url: ''},
@@ -111,6 +115,8 @@ export function useProjectStatus(): {
         select: (data: ProjectStatus): ProjectStatus => ({
           id,
           name,
+          fullDisplayName: data.fullDisplayName,
+          description: data.description,
           healthReport: data.healthReport.map(report => ({
             description: report.description,
             score: report.score,
@@ -186,6 +192,8 @@ export function useProjectStatus(): {
           data ?? {
             id: settings[i].id,
             name: settings[i].name,
+            fullDisplayName: '',
+            description: '',
             healthReport: [],
             inQueue: false,
             lastBuild: {number: 0, url: ''},

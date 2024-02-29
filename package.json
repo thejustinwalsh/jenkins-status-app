@@ -22,7 +22,9 @@
   "dependencies": {
     "@formatjs/intl-datetimeformat": "^6.12.2",
     "@formatjs/intl-displaynames": "^6.6.6",
+    "@formatjs/intl-durationformat": "^0.2.2",
     "@formatjs/intl-getcanonicallocales": "^2.3.0",
+    "@formatjs/intl-listformat": "^7.5.5",
     "@formatjs/intl-locale": "^3.4.5",
     "@formatjs/intl-numberformat": "^8.10.0",
     "@formatjs/intl-pluralrules": "^5.2.12",

@@ -9,3 +9,6 @@ import '@formatjs/intl-pluralrules/locale-data/en';
 import '@formatjs/intl-relativetimeformat/polyfill';
 import '@formatjs/intl-relativetimeformat/locale-data/en';
 import '@formatjs/intl-displaynames/polyfill';
+import '@formatjs/intl-displaynames/locale-data/en';
+import '@formatjs/intl-listformat/polyfill';
+import '@formatjs/intl-listformat/locale-data/en';

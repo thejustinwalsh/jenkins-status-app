@@ -1360,6 +1360,15 @@
     "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
+"@formatjs/intl-durationformat@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-durationformat/-/intl-durationformat-0.2.2.tgz#807b05f4604bcddb0baceff94217ad06cdd27cc7"
+  integrity sha512-8cBgB9ejg9a2pmGVmcVoF0OlK4XifRtm7Se5F9kMj+Ex+5x8QVBLEuqnTHEyV584VMNR2ngUP1dNR36MeTWG3A==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/intl-localematcher" "0.5.4"
+    tslib "^2.4.0"
+
 "@formatjs/intl-enumerator@1.4.5":
   version "1.4.5"
   resolved "https://registry.npmjs.org/@formatjs/intl-enumerator/-/intl-enumerator-1.4.5.tgz"
@@ -1372,6 +1381,15 @@
   resolved "https://registry.npmjs.org/@formatjs/intl-getcanonicallocales/-/intl-getcanonicallocales-2.3.0.tgz"
   integrity sha512-BOXbLwqQ7nKua/l7tKqDLRN84WupDXFDhGJQMFvsMVA2dKuOdRaWTxWpL3cJ7qPkoNw11Jf+Xpj4OSPBBvW0eQ==
   dependencies:
+    tslib "^2.4.0"
+
+"@formatjs/intl-listformat@^7.5.5":
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-7.5.5.tgz#e4c7d741f2201c65e7da71326726e61332c7161e"
+  integrity sha512-XoI52qrU6aBGJC9KJddqnacuBbPlb/bXFN+lIFVFhQ1RnFHpzuFrlFdjD9am2O7ZSYsyqzYRpkVcXeT1GHkwDQ==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.18.2"
+    "@formatjs/intl-localematcher" "0.5.4"
     tslib "^2.4.0"
 
 "@formatjs/intl-locale@^3.4.5":
@@ -1393,7 +1411,7 @@
 
 "@formatjs/intl-numberformat@^8.10.0":
   version "8.10.0"
-  resolved "https://registry.npmjs.org/@formatjs/intl-numberformat/-/intl-numberformat-8.10.0.tgz"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-8.10.0.tgz#f078622e63ebe8d12efee8c12820fe54fe3041d6"
   integrity sha512-i4Isl+E/ljea9wGwqFSlzOINhSM4GgbXnooI5XB0VGxc5dPEn9QkgadH4XM2wN2halvAxUyIXNq/08QpQDnODQ==
   dependencies:
     "@formatjs/ecma402-abstract" "1.18.2"

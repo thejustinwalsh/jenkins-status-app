@@ -1,5 +1,7 @@
-import {useCallback} from 'react';
-import {Button, Heading, YGroup, YStack} from 'tamagui';
+import {useCallback, useMemo} from 'react';
+import {DateTimeFormat} from '@formatjs/intl-datetimeformat/index.js';
+import {DurationFormat} from '@formatjs/intl-durationformat/index.js';
+import {Button, Paragraph, Separator, YGroup, YStack} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import ProjectListItem from '@app/components/ProjectListItem';
@@ -22,6 +24,28 @@ export default function DetailsScreen({
     navigation.navigate('Settings', {id});
   }, [navigation, id]);
 
+  const durationTime = useMemo(
+    () =>
+      new DurationFormat('en', {style: 'narrow'}).format({
+        hours: Math.floor(build.duration / 1000 / 60 / 60) % 24,
+        minutes: Math.floor(build.duration / 1000 / 60) % 60,
+        seconds: Math.floor(build.duration / 1000) % 60,
+      }),
+    [build.duration],
+  );
+
+  const dateTime = useMemo(
+    () =>
+      new DateTimeFormat('en', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+      }).format(new Date(build.timestamp)),
+    [build.timestamp],
+  );
+
   // TODO: ProjectListItem needs to be replaced with a component that has back and settings buttons
   // Likely reuse some of the same design and style so that it transitions as a header
   return (
@@ -34,18 +58,16 @@ export default function DetailsScreen({
           status={info.status}
           onPress={navigateToSettings}
         />
-        <YGroup padding="$4" paddingTop="$0" gap="$4">
+        <YGroup padding="$4" paddingTop="$0" gap="$0">
           <YGroup.Item>
-            <Heading>
-              {project.healthReport.length > 0
-                ? project.healthReport[0].description
-                : ''}
-            </Heading>
-          </YGroup.Item>
-          <YGroup.Item>
-            <Heading>
-              {info.lastRun} - {build.result}
-            </Heading>
+            <Paragraph fontWeight="800">{project.fullDisplayName}</Paragraph>
+            <Paragraph fontStyle="italic">{project.description}</Paragraph>
+            <Separator marginVertical={10} />
+            <YStack gap="$0">
+              <Paragraph>Build Number: {build.number}</Paragraph>
+              <Paragraph>Build Duration: {durationTime}</Paragraph>
+              <Paragraph>Build Time: {dateTime}</Paragraph>
+            </YStack>
           </YGroup.Item>
           <YGroup.Item>
             <Button onPress={goBack}>Go Back</Button>
