@@ -1,18 +1,16 @@
 import {StrictMode} from 'react';
-// @ts-expect-error
-import {useReactQueryDevTools} from '@dev-plugins/react-query';
+import {IntlProvider} from 'react-intl';
 // @ts-expect-error
 import {useVanillaLogViewer} from '@dev-plugins/vanilla-log-viewer';
 import {createStackNavigator} from '@react-navigation/stack';
-import {QueryClientProvider} from '@tanstack/react-query';
 // @ts-expect-error
 import XHRInterceptor from 'react-native/Libraries/Network/XHRInterceptor';
+import {SWRConfig} from 'swr';
 import {TamaguiProvider} from 'tamagui';
 
 import '@app/lib/intl';
 
 import ThemedNavigationContainer from '@app/components/ThemedNavigationContainer';
-import queryClient from '@app/lib/query';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
@@ -47,24 +45,30 @@ const screenOptions: StackNavigationOptions = {
 
 function App(): JSX.Element {
   useVanillaLogViewer();
-  useReactQueryDevTools(queryClient);
 
   return (
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
-          <ThemedNavigationContainer>
-            <Stack.Navigator
-              initialRouteName="Home"
-              detachInactiveScreens
-              screenOptions={screenOptions}>
-              <Stack.Screen name="Home" component={HomeScreen} />
-              <Stack.Screen name="Details" component={DetailsScreen} />
-              <Stack.Screen name="Settings" component={SettingsScreen} />
-            </Stack.Navigator>
-          </ThemedNavigationContainer>
-        </TamaguiProvider>
-      </QueryClientProvider>
+      <IntlProvider locale="en" defaultLocale="en" messages={{}}>
+        <SWRConfig
+          value={{
+            provider: () => new Map(),
+            isOnline: () => true,
+            isVisible: () => true,
+          }}>
+          <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
+            <ThemedNavigationContainer>
+              <Stack.Navigator
+                initialRouteName="Home"
+                detachInactiveScreens
+                screenOptions={screenOptions}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Details" component={DetailsScreen} />
+                <Stack.Screen name="Settings" component={SettingsScreen} />
+              </Stack.Navigator>
+            </ThemedNavigationContainer>
+          </TamaguiProvider>
+        </SWRConfig>
+      </IntlProvider>
     </StrictMode>
   );
 }

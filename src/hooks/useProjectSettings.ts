@@ -28,9 +28,12 @@ export function useProjectSettings() {
 export function useProjectSetting(id: string) {
   const [projects, setProjects] = useProjectSettings();
   const project = useMemo(
-    () => projects.find(p => p.id === id)!,
+    () => projects.find(p => p.id === id),
     [projects, id],
   );
+  if (project === undefined) {
+    throw new Error(`Project "${id}" not found`);
+  }
 
   const setProject = useCallback(
     (p: ProjectSettings) =>

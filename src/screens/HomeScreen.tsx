@@ -7,7 +7,6 @@ import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useKeyEvents} from '@app/hooks/useKeyEvents';
 import {useProjectSettings} from '@app/hooks/useProjectSettings';
-import {useProjectInfo} from '@app/hooks/useProjectStatus';
 import appBridge from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
@@ -79,8 +78,6 @@ export default function HomeScreen({
     [toggleKeyEvents, showCommandPalette],
   );
 
-  const infos = useProjectInfo();
-
   const searchTerms = useMemo(
     () =>
       settings.map(project => ({
@@ -95,9 +92,9 @@ export default function HomeScreen({
   const filteredProjects = useMemo(
     () =>
       filter.length > 0
-        ? infos.filter(i => filter.find(f => f.key === i.id))
-        : infos,
-    [infos, filter],
+        ? settings.filter(p => filter.find(f => f.key === p.id))
+        : settings,
+    [settings, filter],
   );
 
   const handleSearchResults = useCallback(
@@ -154,11 +151,7 @@ export default function HomeScreen({
             {filteredProjects.map(project => (
               <ProjectListItem
                 key={project.id}
-                variant={project.variant as any}
-                title={project.name}
-                timestamp={project.build?.timestamp}
-                duration={project.build?.duration}
-                status={project.status as any}
+                id={project.id}
                 onPress={navigateToDetails(project.id)}
               />
             ))}

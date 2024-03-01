@@ -10,6 +10,8 @@ import {
 import RelativeTime from '@yaireo/relative-time';
 
 import ListItem from '@app/components/StatusListItem';
+import {useProjectSetting} from '@app/hooks/useProjectSettings';
+import {useBuild, useProject} from '@app/hooks/useProjectStatus';
 
 import type {IconProps} from '@tamagui/helpers-icon';
 
@@ -19,13 +21,129 @@ export type ProjectListStatusProps = {
 };
 
 export type ProjectListItemProps = {
-  variant?: 'default' | 'progress';
-  title: string;
-  timestamp?: number;
-  duration?: number;
-  status: 'succeeded' | 'failed' | 'inProgress' | 'pending' | 'canceled';
+  id: string;
   onPress?: () => void;
 };
+
+export type ProjectListItemBuildProps = ProjectListItemProps & {
+  title: string;
+  number: number;
+};
+
+export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
+  const [settings] = useProjectSetting(id);
+  const {project, isLoading} = useProject(settings.id);
+
+  if (isLoading || project === undefined) {
+    return (
+      <ListItem
+        key={id}
+        hoverTheme={defaults.hoverTheme}
+        pressTheme={defaults.pressTheme}
+        overflow="hidden"
+        size={defaults.size}
+        scaleSpace={defaults.scaleSpace}
+        scaleIcon={defaults.scaleIcon}
+        color={defaults.status.canceled.color}
+        icon={defaults.status.canceled.icon}
+        iconAfter={ChevronRight}
+        title={settings.name}
+        subTitle="Fetching status..."
+        onPress={onPress}
+      />
+    );
+  }
+
+  return (
+    <ProjectListItemBuild
+      key={id}
+      id={id}
+      title={settings.name}
+      number={project.lastBuild.number}
+      onPress={onPress}
+    />
+  );
+}
+
+export function ProjectListItemBuild({
+  id,
+  title,
+  number,
+  onPress,
+}: ProjectListItemBuildProps) {
+  const {build, isLoading} = useBuild(id, number);
+  const [value, setValue] = useState<number | undefined>();
+
+  const variant = useMemo(
+    () => (build?.inProgress ? 'progress' : 'default'),
+    [build?.inProgress],
+  );
+  const status = useMemo(() => {
+    if (isLoading) {
+      return 'canceled';
+    }
+    if (build === undefined) {
+      return 'canceled';
+    }
+    if (build.inProgress) {
+      return 'inProgress';
+    }
+    if (build.result === 'SUCCESS') {
+      return 'succeeded';
+    }
+    if (build.result === 'FAILURE') {
+      return 'failed';
+    }
+    return 'pending';
+  }, [build, isLoading]);
+
+  const subTitle = useMemo(
+    () =>
+      variant === 'default' && build
+        ? new RelativeTime().from(new Date(build.timestamp + build.duration))
+        : null,
+    [variant, build],
+  );
+
+  useEffect(() => {
+    let req: number = -1;
+    if (variant === 'progress' && build) {
+      req = requestAnimationFrame(() => {
+        setValue(
+          Math.max(
+            0,
+            Math.min(
+              ((Date.now() - build.timestamp) / build.duration) * defaults.max,
+              defaults.max,
+            ),
+          ),
+        );
+      });
+    }
+    return () => cancelAnimationFrame(req);
+  }, [build, variant]);
+
+  return (
+    <ListItem
+      key={id}
+      hoverTheme={defaults.hoverTheme}
+      pressTheme={defaults.pressTheme}
+      overflow="hidden"
+      size={defaults.size}
+      scaleSpace={defaults.scaleSpace}
+      scaleIcon={defaults.scaleIcon}
+      color={defaults.status[status].color}
+      icon={defaults.status[status].icon}
+      iconAfter={ChevronRight}
+      title={title}
+      subTitle={subTitle}
+      hasProgress={variant === 'progress'}
+      value={value}
+      max={defaults.max}
+      onPress={onPress}
+    />
+  );
+}
 
 const defaults: {
   hoverTheme: boolean;
@@ -71,60 +189,3 @@ const defaults: {
     },
   },
 };
-
-export default function ProjectListItem({
-  variant = 'default',
-  title,
-  status,
-  timestamp,
-  duration,
-  onPress,
-}: ProjectListItemProps) {
-  const [value, setValue] = useState<number | undefined>();
-
-  const subTitle = useMemo(
-    () =>
-      variant === 'default' && timestamp !== undefined
-        ? new RelativeTime().from(new Date(timestamp + (duration ?? 0)))
-        : null,
-    [timestamp, duration, variant],
-  );
-
-  useEffect(() => {
-    let req: number = -1;
-    if (variant === 'progress' && timestamp !== undefined) {
-      req = requestAnimationFrame(() => {
-        setValue(
-          Math.max(
-            0,
-            Math.min(
-              ((Date.now() - timestamp) / (duration ?? 0)) * defaults.max,
-              defaults.max,
-            ),
-          ),
-        );
-      });
-    }
-    return () => cancelAnimationFrame(req);
-  }, [duration, timestamp, variant]);
-
-  return (
-    <ListItem
-      hoverTheme
-      pressTheme
-      overflow="hidden"
-      size={defaults.size}
-      scaleSpace={defaults.scaleSpace}
-      scaleIcon={defaults.scaleIcon}
-      color={defaults.status[status].color}
-      icon={defaults.status[status].icon}
-      iconAfter={ChevronRight}
-      title={title}
-      subTitle={subTitle}
-      hasProgress={variant === 'progress'}
-      value={value}
-      max={defaults.max}
-      onPress={onPress}
-    />
-  );
-}

@@ -72,13 +72,7 @@ export default function SettingsScreen({
   return (
     <AutoSizeStack backgroundColor="$background" minWidth={400} minHeight={200}>
       <YStack padding="$0">
-        <ProjectListItem
-          key={project.id}
-          title={project.name}
-          value=" "
-          status={'succeeded'}
-          onPress={goBack}
-        />
+        <ProjectListItem key={project.id} id={project.id} onPress={goBack} />
         <FocusGroup id="settings" initialFocus="user">
           {/*// TODO: Make Checkbox work with FocusGroup */}
           <YGroup padding="$4" paddingTop="$0" gap="$4">

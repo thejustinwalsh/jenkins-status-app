@@ -20,6 +20,7 @@
     "clean:windows": "shx rm -rf windows/packages windows/x64"
   },
   "dependencies": {
+    "@formatjs/intl": "^2.10.0",
     "@formatjs/intl-datetimeformat": "^6.12.2",
     "@formatjs/intl-displaynames": "^6.6.6",
     "@formatjs/intl-durationformat": "^0.2.2",
@@ -40,12 +41,12 @@
     "@tamagui/lucide-icons": "^1.89.19",
     "@tamagui/shorthands": "^1.89.19",
     "@tamagui/themes": "^1.89.19",
-    "@tanstack/react-query": "^5.20.5",
     "@yaireo/relative-time": "^1.0.4",
     "base-64": "^1.0.0",
     "fast-fuzzy": "^1.12.0",
     "jotai": "^2.6.4",
     "react": "18.2.0",
+    "react-intl": "^6.6.2",
     "react-itertools": "^0.0.6",
     "react-native": "0.73.3",
     "react-native-macos": "^0.73.0-0",
@@ -56,6 +57,7 @@
     "react-native-svg": "^14.0.0",
     "react-native-web": "^0.19.9",
     "react-native-windows": "^0.73.0-0",
+    "swr": "^2.2.5",
     "tamagui": "^1.89.19",
     "use-debounce": "^10.0.0"
   },
@@ -70,6 +72,7 @@
     "@types/react": "^18.0.24",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.2.1",
+    "babel-plugin-formatjs": "^10.5.13",
     "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^8.19.0",
     "eslint-plugin-import": "^2.29.1",
