@@ -13,9 +13,11 @@ import {TamaguiProvider} from 'tamagui';
 import '@app/lib/intl';
 
 import ThemedNavigationContainer from '@app/components/ThemedNavigationContainer';
+import WelcomeScreen from '@app/screens//WelcomeScreen';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
+import {useProjectSettings} from './hooks/useProjectSettings';
 import config from './tamagui.config';
 
 import type {StackProps} from '@app/navigation/params';
@@ -24,11 +26,29 @@ import type {StackNavigationOptions} from '@react-navigation/stack';
 // TODO: Expo Dev-Plugins for fetch
 if (__DEV__) {
   XHRInterceptor.enableInterception();
-  XHRInterceptor.setResponseCallback((...obj: unknown[]) => {
-    if (obj[0] !== 200) {
-      console.warn('fetch:', JSON.stringify(obj, null, 2));
-    }
-  });
+  XHRInterceptor.setResponseCallback(
+    (
+      status: number,
+      timeout: number,
+      response: unknown,
+      responseURL: string,
+      ...res: unknown[]
+    ) => {
+      if (
+        status >= 400 &&
+        (!responseURL.includes(':8081') || !responseURL.includes(':8082'))
+      ) {
+        console.warn(
+          'fetch:',
+          JSON.stringify(
+            {status, timeout, response, responseURL, ...res},
+            null,
+            2,
+          ),
+        );
+      }
+    },
+  );
 }
 
 const Stack = createStackNavigator<StackProps>();
@@ -46,6 +66,10 @@ const screenOptions: StackNavigationOptions = {
 };
 
 function App(): JSX.Element {
+  const [settings] = useProjectSettings();
+  const initialRouteName = settings.length === 0 ? 'Welcome' : 'Home';
+
+  // Dev Plugins
   useMMKVDevTools();
   useVanillaLogViewer();
 
@@ -61,9 +85,10 @@ function App(): JSX.Element {
           <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
             <ThemedNavigationContainer>
               <Stack.Navigator
-                initialRouteName="Home"
+                initialRouteName={initialRouteName}
                 detachInactiveScreens
                 screenOptions={screenOptions}>
+                <Stack.Screen name="Welcome" component={WelcomeScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Details" component={DetailsScreen} />
                 <Stack.Screen name="Settings" component={SettingsScreen} />
