@@ -67,7 +67,8 @@ const screenOptions: StackNavigationOptions = {
 
 function App(): JSX.Element {
   const [settings] = useProjectSettings();
-  const initialRouteName = settings.length === 0 ? 'Welcome' : 'Home';
+  // TODO: Navigate to WelcomeScreen if no settings
+  const initialRouteName = settings.length === 0 ? 'Home' : 'Home';
 
   // Dev Plugins
   useMMKVDevTools();

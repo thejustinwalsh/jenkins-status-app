@@ -88,7 +88,7 @@ export function useProject(id: string) {
     throw new Error(`Project "${id}" not found`);
   }
 
-  const {data, error, isLoading} = useSWR(
+  const {data, error, isLoading, isValidating} = useSWR(
     project.url,
     url => fetchProject(url, project.auth),
     {refreshInterval: REFETCH},
@@ -98,6 +98,7 @@ export function useProject(id: string) {
     project: data,
     isError: error,
     isLoading,
+    isValidating,
   };
 }
 
@@ -114,7 +115,7 @@ export function useBuild(id: string, number?: number) {
   }
 
   const buildUrl = new URL(`/${number}`, project.url).toString();
-  const {data, error, isLoading} = useSWR(
+  const {data, error, isLoading, isValidating} = useSWR(
     () => (number ? buildUrl : null),
     url => fetchBuild(url, project.auth),
     {refreshInterval: REFETCH},
@@ -124,5 +125,6 @@ export function useBuild(id: string, number?: number) {
     build: data,
     isError: error,
     isLoading,
+    isValidating,
   };
 }

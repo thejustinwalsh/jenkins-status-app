@@ -33,7 +33,7 @@ const commands: CommandSet[] = [
 export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Home'>) {
-  const [settings] = useProjectSettings();
+  const [settings, setSettings] = useProjectSettings();
   const [showCommandPalette, setShowCommandPalette] = useState<boolean>(false);
   const [commandPaletteMode, setCommandPaletteMode] = useState<
     'search' | 'command'
@@ -103,25 +103,38 @@ export default function HomeScreen({
   );
 
   // TODO: Implement command navigation and list refresh commands
-  const handleCommandSelected = useCallback((command: React.Key) => {
-    switch (command) {
-      case 'add':
-        //navigation.navigate('Add');
-        break;
-      case 'refresh':
-        //appBridge.refresh();
-        break;
-      case 'settings':
-        //navigation.navigate('Settings');
-        break;
-      case 'help':
-        //navigation.navigate('Help');
-        break;
-      case 'quit':
-        appBridge.closeApp();
-        break;
-    }
-  }, []);
+  const handleCommandSelected = useCallback(
+    (command: React.Key) => {
+      switch (command) {
+        case 'add':
+          // TODO: Quick hack for adding new projects, nav to settings screen with this data?
+          setSettings([
+            ...settings,
+            {
+              id: 'new',
+              name: 'New Project',
+              url: 'https://devnull-as-a-service.com/dev/null',
+              auth: {username: '', password: ''},
+              notifications: {onFailure: false, onSuccess: false},
+            },
+          ]);
+          break;
+        case 'refresh':
+          //appBridge.refresh();
+          break;
+        case 'settings':
+          //navigation.navigate('Settings');
+          break;
+        case 'help':
+          //navigation.navigate('Help');
+          break;
+        case 'quit':
+          appBridge.closeApp();
+          break;
+      }
+    },
+    [settings, setSettings],
+  );
 
   const handleCommandPaletteClosed = useCallback(() => {
     setShowCommandPalette(false);

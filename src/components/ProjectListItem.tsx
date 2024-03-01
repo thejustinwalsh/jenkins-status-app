@@ -12,6 +12,7 @@ import RelativeTime from '@yaireo/relative-time';
 import ListItem from '@app/components/StatusListItem';
 import {useProjectSetting} from '@app/hooks/useProjectSettings';
 import {useBuild, useProject} from '@app/hooks/useProjectStatus';
+import appBridge from '@app/lib/native';
 
 import type {IconProps} from '@tamagui/helpers-icon';
 
@@ -71,14 +72,21 @@ export function ProjectListItemBuild({
   number,
   onPress,
 }: ProjectListItemBuildProps) {
-  const {build, isLoading} = useBuild(id, number);
+  const {build, isLoading, isValidating} = useBuild(id, number);
   const [value, setValue] = useState<number | undefined>();
+  const [subTitle, setSubTitle] = useState<string | undefined>();
 
-  const variant = useMemo(
-    () => (build?.inProgress ? 'progress' : 'default'),
-    [build?.inProgress],
-  );
+  const variant = useMemo(() => {
+    // eslint-disable-next-line no-void -- ensure we update when new data is available
+    void isValidating;
+
+    return build?.inProgress ? 'progress' : 'default';
+  }, [build?.inProgress, isValidating]);
+
   const status = useMemo(() => {
+    // eslint-disable-next-line no-void -- ensure we update when new data is available
+    void isValidating;
+
     if (isLoading) {
       return 'canceled';
     }
@@ -95,32 +103,65 @@ export function ProjectListItemBuild({
       return 'failed';
     }
     return 'pending';
-  }, [build, isLoading]);
+  }, [build, isLoading, isValidating]);
 
-  const subTitle = useMemo(
-    () =>
-      variant === 'default' && build
-        ? new RelativeTime().from(new Date(build.timestamp + build.duration))
-        : null,
-    [variant, build],
-  );
-
+  // TODO: make this a custom hook for smooth progress updates
   useEffect(() => {
     let req: number = -1;
-    if (variant === 'progress' && build) {
-      req = requestAnimationFrame(() => {
+    if (variant === 'progress' && build && build.inProgress) {
+      const updateProgress = () => {
         setValue(
           Math.max(
             0,
             Math.min(
-              ((Date.now() - build.timestamp) / build.duration) * defaults.max,
+              ((Date.now() - build.timestamp) / build.estimatedDuration) *
+                defaults.max,
               defaults.max,
             ),
           ),
         );
-      });
+        req = requestAnimationFrame(updateProgress);
+      };
+      updateProgress();
+    } else if (req !== -1) {
+      cancelAnimationFrame(req);
     }
     return () => cancelAnimationFrame(req);
+  }, [build, variant]);
+
+  // TODO: make this a custom hook for updating the project timestamps
+  useEffect(() => {
+    let req: number = -1;
+    let interval = 15000;
+    let isInBackground = false;
+
+    const updateTimestamp = () => {
+      setSubTitle(
+        variant === 'default' && build
+          ? new RelativeTime().from(new Date(build.timestamp + build.duration))
+          : undefined,
+      );
+      interval =
+        build && Date.now() - build.timestamp > 1000 * 60 * 60 ? 60000 : 15000;
+      req = setTimeout(updateTimestamp, interval) as unknown as number;
+    };
+
+    const onPopoverStateChange = (isVisible: boolean) => {
+      isInBackground = !isVisible;
+      isInBackground ? clearTimeout(req) : updateTimestamp();
+    };
+
+    let subscription = appBridge.addListener('popover', onPopoverStateChange);
+    if (build && !isInBackground) {
+      updateTimestamp();
+    } else if (req !== -1) {
+      clearTimeout(req);
+    }
+
+    return () => {
+      clearTimeout(req);
+      subscription.remove();
+    };
   }, [build, variant]);
 
   return (
@@ -136,7 +177,7 @@ export function ProjectListItemBuild({
       icon={defaults.status[status].icon}
       iconAfter={ChevronRight}
       title={title}
-      subTitle={subTitle}
+      subTitle={subTitle ?? ' '}
       hasProgress={variant === 'progress'}
       value={value}
       max={defaults.max}
