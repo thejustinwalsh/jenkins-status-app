@@ -14,7 +14,7 @@ class AppBridge: RCTEventEmitter {
     return true
   }
 
-  @objc override func supportedEvents() -> [String] { ["keyDown", "keyUp"] }
+  @objc override func supportedEvents() -> [String] { ["keyDown", "keyUp", "popover"] }
   
   @objc func launchAtLogin(_ isEnabled: Bool) {
     LaunchAtLogin.isEnabled = isEnabled
@@ -58,6 +58,14 @@ class AppBridge: RCTEventEmitter {
     sendEvent(withName: "keyUp", body: [
       "key":  key ?? "",
       "keyCode": keyCode,
+    ])
+  }
+
+  // Window state
+
+  func sendPopoverStateEvent(isVisible: Bool) {
+    sendEvent(withName: "popover", body: [
+      "isVisible": isVisible,
     ])
   }
   

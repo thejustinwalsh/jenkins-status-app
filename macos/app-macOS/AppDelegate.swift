@@ -120,6 +120,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   @objc func togglePopover(_ sender: AnyObject?) {
     if self.popover.isVisible && self.popover.isKeyWindow {
       self.popover.close()
+      
+      if let appBridge = self.getBridge() {
+        appBridge.sendPopoverStateEvent(isVisible: false)
+      }
     } else {
       self.popover.makeKeyAndOrderFront(self)
       self.popover.center()
@@ -133,6 +137,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       let size = CGSize(width: popoverWidth, height: popoverHeight)
       let frame = NSRect(origin: origin, size: size)
       self.popover.setFrame(frame, display: true)
+
+      if let appBridge = self.getBridge() {
+        appBridge.sendPopoverStateEvent(isVisible: true)
+      }
     }
   }
 
