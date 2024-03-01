@@ -1,6 +1,5 @@
 import {useMemo} from 'react';
 import {useQueries} from '@tanstack/react-query';
-import RelativeTime from '@yaireo/relative-time';
 import {encode as btoa} from 'base-64';
 
 import {useProjectSettings} from './useProjectSettings';
@@ -47,11 +46,12 @@ export type ProjectInfo = {
   id: string;
   name: string;
   variant: 'default' | 'progress';
-  lastRun: string;
   status: 'inProgress' | 'succeeded' | 'failed' | 'pending' | 'canceled';
+  details?: ProjectStatus;
+  build?: BuildStatus;
 };
 
-const REFETCH = 60 * 1000;
+const REFETCH = 5 * 60 * 1000;
 
 function fetchProjectStatus(
   url: string,
@@ -94,8 +94,11 @@ export function useProjectStatus(): {
     queries: settings.map(
       ({id, name, url, auth}): UseQueryOptions<ProjectStatus> => ({
         queryKey: ['project', id],
+        staleTime: REFETCH,
         refetchInterval: REFETCH,
         refetchIntervalInBackground: true,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
         queryFn: () => fetchProjectStatus(url, auth),
         placeholderData: (prev?: ProjectStatus) => ({
           id: prev?.id ?? id,
@@ -105,7 +108,10 @@ export function useProjectStatus(): {
           healthReport: prev?.healthReport ?? [],
           inQueue: prev?.inQueue ?? false,
           lastBuild: prev?.lastBuild ?? {number: 0, url: ''},
-          lastCompletedBuild: prev?.lastCompletedBuild ?? {number: 0, url: ''},
+          lastCompletedBuild: prev?.lastCompletedBuild ?? {
+            number: 0,
+            url: '',
+          },
           lastFailedBuild: prev?.lastFailedBuild ?? {number: 0, url: ''},
           lastSuccessfulBuild: prev?.lastSuccessfulBuild ?? {
             number: 0,
@@ -161,8 +167,11 @@ export function useProjectStatus(): {
           }
           return {
             queryKey: ['project', project?.id, project?.lastBuild.number],
+            staleTime: REFETCH,
             refetchInterval: REFETCH,
             refetchIntervalInBackground: true,
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
             // This should not run until the query keys are defined
             queryFn: () =>
               fetchBuildStatus(
@@ -242,7 +251,7 @@ export function useProjectInfo() {
     [builds],
   );
 
-  const info: ProjectInfo[] = useMemo(
+  const infos: ProjectInfo[] = useMemo(
     () =>
       projects.map(project => {
         const p = projectsMap.get(project.id)!;
@@ -263,25 +272,21 @@ export function useProjectInfo() {
           id: project.id,
           name: project.name,
           variant: b?.inProgress ? 'progress' : 'default',
-          lastRun: new RelativeTime().from(
-            new Date((b?.timestamp ?? 0) + (b?.duration ?? 0)),
-          ),
           status: s,
+          details: p,
+          build: b,
         };
       }),
     [buildsMap, projects, projectsMap],
   );
 
-  return [info, projectsMap, buildsMap] as const;
+  return infos;
 }
 
 export function useProjectInfoById(id: string) {
-  const [infos, projects, builds] = useProjectInfo();
+  const infos = useProjectInfo();
   const infosMap = useMemo(() => new Map(infos.map(i => [i.id, i])), [infos]);
+  const info = infosMap.get(id);
 
-  const project = projects.get(id)!;
-  const build = builds.get(project.lastBuild.number)!;
-  const info = infosMap.get(id)!;
-
-  return [info, project, build] as const;
+  return info;
 }

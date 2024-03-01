@@ -1,3 +1,4 @@
+import {useEffect, useMemo, useState} from 'react';
 import {
   AlertCircle,
   CheckCircle2,
@@ -6,6 +7,7 @@ import {
   PauseCircle,
   XCircle,
 } from '@tamagui/lucide-icons';
+import RelativeTime from '@yaireo/relative-time';
 
 import ListItem from '@app/components/StatusListItem';
 
@@ -19,7 +21,8 @@ export type ProjectListStatusProps = {
 export type ProjectListItemProps = {
   variant?: 'default' | 'progress';
   title: string;
-  value?: string | number;
+  timestamp?: number;
+  duration?: number;
   status: 'succeeded' | 'failed' | 'inProgress' | 'pending' | 'canceled';
   onPress?: () => void;
 };
@@ -72,10 +75,39 @@ const defaults: {
 export default function ProjectListItem({
   variant = 'default',
   title,
-  value = '',
   status,
+  timestamp,
+  duration,
   onPress,
 }: ProjectListItemProps) {
+  const [value, setValue] = useState<number | undefined>();
+
+  const subTitle = useMemo(
+    () =>
+      variant === 'default' && timestamp !== undefined
+        ? new RelativeTime().from(new Date(timestamp + (duration ?? 0)))
+        : null,
+    [timestamp, duration, variant],
+  );
+
+  useEffect(() => {
+    let req: number = -1;
+    if (variant === 'progress' && timestamp !== undefined) {
+      req = requestAnimationFrame(() => {
+        setValue(
+          Math.max(
+            0,
+            Math.min(
+              ((Date.now() - timestamp) / (duration ?? 0)) * defaults.max,
+              defaults.max,
+            ),
+          ),
+        );
+      });
+    }
+    return () => cancelAnimationFrame(req);
+  }, [duration, timestamp, variant]);
+
   return (
     <ListItem
       hoverTheme
@@ -88,9 +120,9 @@ export default function ProjectListItem({
       icon={defaults.status[status].icon}
       iconAfter={ChevronRight}
       title={title}
-      subTitle={variant === 'progress' ? variant : value}
+      subTitle={subTitle}
       hasProgress={variant === 'progress'}
-      value={typeof value === 'number' ? value : 0}
+      value={value}
       max={defaults.max}
       onPress={onPress}
     />

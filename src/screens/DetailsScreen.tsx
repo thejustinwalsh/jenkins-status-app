@@ -15,7 +15,10 @@ export default function DetailsScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Details'>) {
   const {id} = route.params;
-  const [info, project, build] = useProjectInfoById(id);
+  const info = useProjectInfoById(id);
+  if (!info) {
+    throw new Error('Project not found');
+  }
 
   const goBack = useCallback(() => {
     navigation.goBack();
@@ -24,27 +27,27 @@ export default function DetailsScreen({
     navigation.navigate('Settings', {id});
   }, [navigation, id]);
 
-  const durationTime = useMemo(
-    () =>
-      new DurationFormat('en', {style: 'narrow'}).format({
-        hours: Math.floor(build.duration / 1000 / 60 / 60) % 24,
-        minutes: Math.floor(build.duration / 1000 / 60) % 60,
-        seconds: Math.floor(build.duration / 1000) % 60,
-      }),
-    [build.duration],
-  );
+  const durationTime = useMemo(() => {
+    return info?.build
+      ? new DurationFormat('en', {style: 'narrow'}).format({
+          hours: Math.floor(info.build.duration / 1000 / 60 / 60) % 24,
+          minutes: Math.floor(info.build.duration / 1000 / 60) % 60,
+          seconds: Math.floor(info.build.duration / 1000) % 60,
+        })
+      : 'Unknown';
+  }, [info]);
 
-  const dateTime = useMemo(
-    () =>
-      new DateTimeFormat('en', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-      }).format(new Date(build.timestamp)),
-    [build.timestamp],
-  );
+  const dateTime = useMemo(() => {
+    return info?.build
+      ? new DateTimeFormat('en', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+        }).format(new Date(info.build.timestamp))
+      : 'Unknown';
+  }, [info]);
 
   // TODO: ProjectListItem needs to be replaced with a component that has back and settings buttons
   // Likely reuse some of the same design and style so that it transitions as a header
@@ -54,17 +57,22 @@ export default function DetailsScreen({
         <ProjectListItem
           key={id}
           title={info.name}
-          value=" "
+          timestamp={info.build?.timestamp}
+          duration={info.build?.duration}
           status={info.status}
           onPress={navigateToSettings}
         />
         <YGroup padding="$4" paddingTop="$0" gap="$0">
           <YGroup.Item>
-            <Paragraph fontWeight="800">{project.fullDisplayName}</Paragraph>
-            <Paragraph fontStyle="italic">{project.description}</Paragraph>
+            <Paragraph fontWeight="800">
+              {info.details?.fullDisplayName}
+            </Paragraph>
+            <Paragraph fontStyle="italic">
+              {info.details?.description}
+            </Paragraph>
             <Separator marginVertical={10} />
             <YStack gap="$0">
-              <Paragraph>Build Number: {build.number}</Paragraph>
+              <Paragraph>Build Number: {info.build?.number}</Paragraph>
               <Paragraph>Build Duration: {durationTime}</Paragraph>
               <Paragraph>Build Time: {dateTime}</Paragraph>
             </YStack>

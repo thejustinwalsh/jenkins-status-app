@@ -79,7 +79,7 @@ export default function HomeScreen({
     [toggleKeyEvents, showCommandPalette],
   );
 
-  const [infos, projects, builds] = useProjectInfo();
+  const infos = useProjectInfo();
 
   const searchTerms = useMemo(
     () =>
@@ -98,22 +98,6 @@ export default function HomeScreen({
         ? infos.filter(i => filter.find(f => f.key === i.id))
         : infos,
     [infos, filter],
-  );
-
-  const getEstimatedCompletion = useCallback(
-    (id: string) => {
-      const buildId = projects.get(id)?.lastBuild.number ?? 0;
-      const {estimatedDuration, timestamp} = builds.get(buildId) ?? {
-        estimatedDuration: 0,
-      };
-      const duration = Date.now() - (timestamp ?? Date.now());
-      const percent = Math.max(
-        0,
-        Math.min((duration / estimatedDuration) * 100, 100),
-      );
-      return percent;
-    },
-    [projects, builds],
   );
 
   const handleSearchResults = useCallback(
@@ -167,21 +151,13 @@ export default function HomeScreen({
             />
           </YGroup.Item>
           <YGroup.Item>
-            {/*
-             * // TODO: Modify the project list item to take in a timestamp, and an expected duration, use the variant to determine if the project is in progress
-             */}
             {filteredProjects.map(project => (
               <ProjectListItem
                 key={project.id}
                 variant={project.variant as any}
                 title={project.name}
-                //timestamp={Date.now()}
-                //duration={Date.now() + 1000 * 60 * 60}
-                value={
-                  project.variant === 'default'
-                    ? project.lastRun
-                    : getEstimatedCompletion(project.id)
-                }
+                timestamp={project.build?.timestamp}
+                duration={project.build?.duration}
                 status={project.status as any}
                 onPress={navigateToDetails(project.id)}
               />
