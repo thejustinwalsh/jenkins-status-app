@@ -1,6 +1,8 @@
 import {StrictMode} from 'react';
 // @ts-expect-error
 import {useReactQueryDevTools} from '@dev-plugins/react-query';
+// @ts-expect-error
+import {useVanillaLogViewer} from '@dev-plugins/vanilla-log-viewer';
 import {createStackNavigator} from '@react-navigation/stack';
 import {QueryClientProvider} from '@tanstack/react-query';
 // @ts-expect-error
@@ -44,6 +46,7 @@ const screenOptions: StackNavigationOptions = {
 };
 
 function App(): JSX.Element {
+  useVanillaLogViewer();
   useReactQueryDevTools(queryClient);
 
   return (
