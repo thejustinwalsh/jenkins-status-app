@@ -107,7 +107,7 @@ const useListItem = (
               {subTitle ? (
                 <>
                   {typeof subTitle === 'string' && noTextWrap !== 'all' ? (
-                    // TODO can use theme but we need to standardize to alt themes
+                    // TODO: can use theme but we need to standardize to alt themes
                     // or standardize on subtle colors in themes
                     <Subtitle unstyled={unstyled} size={size}>
                       {subTitle}

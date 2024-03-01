@@ -25,6 +25,7 @@ export function useProjectSettings() {
   return useAtom(settingsAtom);
 }
 
+// TODO: Refactor this to store project settings in a namespaced key per project
 export function useProjectSetting(id: string) {
   const [projects, setProjects] = useProjectSettings();
   const project = useMemo(

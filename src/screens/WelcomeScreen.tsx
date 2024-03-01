@@ -1,5 +1,6 @@
 import {Heading, YGroup, YStack} from 'tamagui';
 
+// TODO: Add intro experience and configure first project
 export default function WelcomeScreen() {
   return (
     <YStack fullscreen backgroundColor="$background">
