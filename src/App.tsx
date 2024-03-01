@@ -1,6 +1,8 @@
 import {StrictMode} from 'react';
 import {IntlProvider} from 'react-intl';
 // @ts-expect-error
+import {useMMKVDevTools} from '@dev-plugins/react-native-mmkv';
+// @ts-expect-error
 import {useVanillaLogViewer} from '@dev-plugins/vanilla-log-viewer';
 import {createStackNavigator} from '@react-navigation/stack';
 // @ts-expect-error
@@ -44,6 +46,7 @@ const screenOptions: StackNavigationOptions = {
 };
 
 function App(): JSX.Element {
+  useMMKVDevTools();
   useVanillaLogViewer();
 
   return (
