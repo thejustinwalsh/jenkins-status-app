@@ -6,7 +6,7 @@ import AutoSizeStack from '@app/components/AutoSizeStack';
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useKeyEvents} from '@app/hooks/useKeyEvents';
-import {useProjectSettings} from '@app/hooks/useProjectSettings';
+import {useProjects} from '@app/hooks/useProjects';
 import appBridge from '@app/lib/native';
 
 import type {SearchSet} from '@app/components/SearchableInput';
@@ -33,7 +33,7 @@ const commands: CommandSet[] = [
 export default function HomeScreen({
   navigation,
 }: NativeStackScreenProps<StackProps, 'Home'>) {
-  const [settings, setSettings] = useProjectSettings();
+  const [projects, _, addProject] = useProjects();
   const [showCommandPalette, setShowCommandPalette] = useState<boolean>(false);
   const [commandPaletteMode, setCommandPaletteMode] = useState<
     'search' | 'command'
@@ -80,11 +80,11 @@ export default function HomeScreen({
 
   const searchTerms = useMemo(
     () =>
-      settings.map(project => ({
+      projects.map(project => ({
         key: project.id,
-        value: project.name,
+        value: project.key,
       })),
-    [settings],
+    [projects],
   );
 
   const [filter, setFilter] = useState<SearchSet[]>([]);
@@ -92,9 +92,9 @@ export default function HomeScreen({
   const filteredProjects = useMemo(
     () =>
       filter.length > 0
-        ? settings.filter(p => filter.find(f => f.key === p.id))
-        : settings,
-    [settings, filter],
+        ? projects.filter(p => filter.find(f => f.key === p.id))
+        : projects,
+    [projects, filter],
   );
 
   const handleSearchResults = useCallback(
@@ -108,16 +108,7 @@ export default function HomeScreen({
       switch (command) {
         case 'add':
           // TODO: Quick hack for adding new projects, nav to settings screen with this data?
-          setSettings([
-            ...settings,
-            {
-              id: 'new',
-              name: 'New Project',
-              url: 'https://devnull-as-a-service.com/dev/null',
-              auth: {username: '', password: ''},
-              notifications: {onFailure: false, onSuccess: false},
-            },
-          ]);
+          addProject('New Project');
           break;
         case 'refresh':
           //appBridge.refresh();
@@ -133,7 +124,7 @@ export default function HomeScreen({
           break;
       }
     },
-    [settings, setSettings],
+    [addProject],
   );
 
   const handleCommandPaletteClosed = useCallback(() => {

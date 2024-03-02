@@ -33,4 +33,5 @@ export const atomWithStorage = <T>(key: string, initialValue: T) =>
       removeItem,
       clearAll,
     })),
+    {getOnInit: true},
   );

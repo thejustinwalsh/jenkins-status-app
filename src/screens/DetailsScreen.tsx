@@ -5,7 +5,7 @@ import {Button, Paragraph, Separator, YGroup, YStack} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import ProjectListItem from '@app/components/ProjectListItem';
-import {useBuild, useProject} from '@app/hooks/useProjectStatus';
+import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
 
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -16,8 +16,8 @@ export default function DetailsScreen({
 }: NativeStackScreenProps<StackProps, 'Details'>) {
   const {id} = route.params;
   const intl = useIntl();
-  const {project} = useProject(id);
-  const {build} = useBuild(id, project?.lastBuild.number);
+  const {project} = useProjectState(id);
+  const {build} = useBuildState(id, project?.lastBuild.number);
 
   const goBack = useCallback(() => {
     navigation.goBack();

@@ -10,8 +10,8 @@ import {
 import RelativeTime from '@yaireo/relative-time';
 
 import ListItem from '@app/components/StatusListItem';
-import {useProjectSetting} from '@app/hooks/useProjectSettings';
-import {useBuild, useProject} from '@app/hooks/useProjectStatus';
+import {useProject} from '@app/hooks/useProjects';
+import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
 import appBridge from '@app/lib/native';
 
 import type {IconProps} from '@tamagui/helpers-icon';
@@ -32,10 +32,10 @@ export type ProjectListItemBuildProps = ProjectListItemProps & {
 };
 
 export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
-  const [settings] = useProjectSetting(id);
-  const {project, isLoading} = useProject(settings.id);
+  const [project] = useProject(id);
+  const {project: state, isLoading} = useProjectState(project.id);
 
-  if (isLoading || project === undefined) {
+  if (isLoading || state === undefined) {
     return (
       <ListItem
         key={id}
@@ -48,7 +48,7 @@ export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
         color={defaults.status.canceled.color}
         icon={defaults.status.canceled.icon}
         iconAfter={ChevronRight}
-        title={settings.name}
+        title={project.name}
         subTitle="Fetching status..."
         onPress={onPress}
       />
@@ -59,8 +59,8 @@ export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
     <ProjectListItemBuild
       key={id}
       id={id}
-      title={settings.name}
-      number={project.lastBuild.number}
+      title={project.name}
+      number={state.lastBuild.number}
       onPress={onPress}
     />
   );
@@ -72,7 +72,7 @@ export function ProjectListItemBuild({
   number,
   onPress,
 }: ProjectListItemBuildProps) {
-  const {build, isLoading, isValidating} = useBuild(id, number);
+  const {build, isLoading, isValidating} = useBuildState(id, number);
   const [value, setValue] = useState<number | undefined>();
   const [subTitle, setSubTitle] = useState<string | undefined>();
 

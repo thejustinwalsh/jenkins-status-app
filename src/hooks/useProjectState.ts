@@ -1,10 +1,9 @@
-import {useMemo} from 'react';
 import {encode as btoa} from 'base-64';
 import useSWR from 'swr';
 
-import {useProjectSettings} from './useProjectSettings';
+import {useProject} from './useProjects';
 
-import type {ProjectSettings} from './useProjectSettings';
+import type {ProjectSettings} from './useProjects';
 
 export type ProjectStatus = {
   id: string;
@@ -76,18 +75,8 @@ function fetchBuild(
   }).then(res => res.json() as Promise<BuildStatus>);
 }
 
-export function useProject(id: string) {
-  const [settings] = useProjectSettings();
-  const settingsMap = useMemo(
-    () => new Map(settings.map(s => [s.id, s])),
-    [settings],
-  );
-
-  const project = settingsMap.get(id);
-  if (!project) {
-    throw new Error(`Project "${id}" not found`);
-  }
-
+export function useProjectState(id: string) {
+  const [project] = useProject(id);
   const {data, error, isLoading, isValidating} = useSWR(
     project.url,
     url => fetchProject(url, project.auth),
@@ -102,18 +91,8 @@ export function useProject(id: string) {
   };
 }
 
-export function useBuild(id: string, number?: number) {
-  const [settings] = useProjectSettings();
-  const settingsMap = useMemo(
-    () => new Map(settings.map(s => [s.id, s])),
-    [settings],
-  );
-
-  const project = settingsMap.get(id);
-  if (!project) {
-    throw new Error(`Project "${id}" not found`);
-  }
-
+export function useBuildState(id: string, number?: number) {
+  const [project] = useProject(id);
   const buildUrl = new URL(`/${number}`, project.url).toString();
   const {data, error, isLoading, isValidating} = useSWR(
     () => (number ? buildUrl : null),

@@ -6,9 +6,9 @@ import AutoSizeStack from '@app/components/AutoSizeStack';
 import FocusGroup from '@app/components/FocusGroup';
 import IconInput from '@app/components/IconInput';
 import ProjectListItem from '@app/components/ProjectListItem';
-import {useProjectSetting} from '@app/hooks/useProjectSettings';
+import {useProject} from '@app/hooks/useProjects';
 
-import type {ProjectSettings} from '@app/hooks/useProjectSettings';
+import type {ProjectSettings} from '@app/hooks/useProjects';
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
@@ -60,7 +60,7 @@ export default function SettingsScreen({
   route,
   navigation,
 }: NativeStackScreenProps<StackProps, 'Settings'>) {
-  const [initial, setProject] = useProjectSetting(route.params.id);
+  const [initial, setProject] = useProject(route.params.id);
   const [project, dispatch] = useReducer(settingsReducer, initial);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- only update when project changes
   useEffect(() => setProject(project), [project]);

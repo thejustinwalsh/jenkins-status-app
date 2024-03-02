@@ -17,7 +17,7 @@ import WelcomeScreen from '@app/screens//WelcomeScreen';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
-import {useProjectSettings} from './hooks/useProjectSettings';
+import {useProjects} from './hooks/useProjects';
 import config from './tamagui.config';
 
 import type {StackProps} from '@app/navigation/params';
@@ -66,9 +66,8 @@ const screenOptions: StackNavigationOptions = {
 };
 
 function App(): JSX.Element {
-  const [settings] = useProjectSettings();
-  // TODO: Navigate to WelcomeScreen if no settings
-  const initialRouteName = settings.length === 0 ? 'Home' : 'Home';
+  const [projects] = useProjects();
+  const initialRouteName = projects.length === 0 ? 'Welcome' : 'Home';
 
   // Dev Plugins
   useMMKVDevTools();
