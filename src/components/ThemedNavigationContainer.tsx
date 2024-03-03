@@ -1,3 +1,4 @@
+import {useMemo} from 'react';
 import {
   NavigationContainer,
   DefaultTheme as NavigationContainerDefaultTheme,
@@ -16,17 +17,17 @@ export default function ThemedNavigationContainer({
   const background = useTheme().background.get() || '#000000';
   appBridge.setBackgroundColor(background);
 
-  return (
-    <NavigationContainer
-      theme={{
-        ...NavigationContainerDefaultTheme,
-        dark: true,
-        colors: {
-          ...NavigationContainerDefaultTheme.colors,
-          background,
-        },
-      }}>
-      {children}
-    </NavigationContainer>
+  const theme = useMemo(
+    () => ({
+      ...NavigationContainerDefaultTheme,
+      dark: true,
+      colors: {
+        ...NavigationContainerDefaultTheme.colors,
+        background,
+      },
+    }),
+    [background],
   );
+
+  return <NavigationContainer theme={theme}>{children}</NavigationContainer>;
 }
