@@ -1,4 +1,4 @@
-import {StrictMode} from 'react';
+import {StrictMode, useMemo} from 'react';
 import {IntlProvider} from 'react-intl';
 // @ts-expect-error
 import {useMMKVDevTools} from '@dev-plugins/react-native-mmkv';
@@ -13,10 +13,10 @@ import {TamaguiProvider} from 'tamagui';
 import '@app/lib/intl';
 
 import ThemedNavigationContainer from '@app/components/ThemedNavigationContainer';
-import WelcomeScreen from '@app/screens//WelcomeScreen';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
+import WelcomeScreen from '@app/screens/WelcomeScreen';
 import {useProjects} from './hooks/useProjects';
 import config from './tamagui.config';
 
@@ -67,7 +67,10 @@ const screenOptions: StackNavigationOptions = {
 
 function App(): JSX.Element {
   const [projects] = useProjects();
-  const initialRouteName = projects.length === 0 ? 'Welcome' : 'Home';
+  const initialRouteName: keyof StackProps = useMemo(
+    () => (projects.length === 0 ? 'Welcome' : 'Home'),
+    [projects],
+  );
 
   // Dev Plugins
   useMMKVDevTools();
