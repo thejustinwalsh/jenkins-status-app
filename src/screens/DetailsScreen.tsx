@@ -1,10 +1,19 @@
 import {useCallback, useMemo} from 'react';
 import {useIntl} from 'react-intl';
+import {Linking, Pressable} from 'react-native';
 import {DurationFormat} from '@formatjs/intl-durationformat/index';
-import {Button, Paragraph, Separator, YGroup, YStack} from 'tamagui';
+import {
+  Button,
+  Paragraph,
+  Separator,
+  SizableText,
+  YGroup,
+  YStack,
+} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import ProjectListItem from '@app/components/ProjectListItem';
+import {useProject} from '@app/hooks/useProjects';
 import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
 
 import type {StackProps} from '@app/navigation/params';
@@ -16,8 +25,9 @@ export default function DetailsScreen({
 }: NativeStackScreenProps<StackProps, 'Details'>) {
   const {id} = route.params;
   const intl = useIntl();
-  const {project} = useProjectState(id);
-  const {build} = useBuildState(id, project?.lastBuild.number);
+  const [project] = useProject(id);
+  const {project: state} = useProjectState(id);
+  const {build} = useBuildState(id, state?.lastBuild.number);
 
   const goBack = useCallback(() => {
     navigation.goBack();
@@ -51,17 +61,37 @@ export default function DetailsScreen({
       : 'Unknown';
   }, [intl, build]);
 
+  const details = useMemo(
+    () => ({
+      fullDisplayName: state?.fullDisplayName,
+      description: state?.description,
+      buildNumber: build?.number,
+    }),
+    [state, build],
+  );
+
+  const handleLinkPress = useCallback(
+    () => Linking.openURL(project.url),
+    [project],
+  );
+
   return (
     <AutoSizeStack minWidth={400} minHeight={200} backgroundColor="$background">
       <YStack padding="$0">
         <ProjectListItem key={id} id={id} onPress={navigateToSettings} />
         <YGroup padding="$4" paddingTop="$0" gap="$0">
           <YGroup.Item>
-            <Paragraph fontWeight="800">{project?.fullDisplayName}</Paragraph>
-            <Paragraph fontStyle="italic">{project?.description}</Paragraph>
+            <Pressable onPress={handleLinkPress}>
+              <SizableText color="$blue9" size="$4">
+                {details.fullDisplayName}
+              </SizableText>
+            </Pressable>
+            <SizableText fontStyle="italic" size="$3">
+              {details.description}
+            </SizableText>
             <Separator marginVertical={10} />
             <YStack gap="$0">
-              <Paragraph>Build Number: {build?.number}</Paragraph>
+              <Paragraph>Build Number: {details.buildNumber}</Paragraph>
               <Paragraph>Build Duration: {durationTime}</Paragraph>
               <Paragraph>Build Time: {dateTime}</Paragraph>
             </YStack>
