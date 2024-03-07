@@ -7,6 +7,7 @@ class AppBridge extends NativeEventEmitter {
   resize: (width: number, height: number) => void;
   closeApp: () => void;
   consumeKeys: (state: boolean) => void;
+  sendNotification: (title: string, message: string, url: string) => void;
 
   constructor(module: any) {
     super(module);
@@ -16,6 +17,7 @@ class AppBridge extends NativeEventEmitter {
     this.resize = module.resize;
     this.closeApp = module.closeApp;
     this.consumeKeys = module.consumeKeys;
+    this.sendNotification = module.sendNotification;
   }
 }
 

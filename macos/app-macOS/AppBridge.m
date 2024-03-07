@@ -24,4 +24,6 @@ RCT_EXTERN_METHOD(closeApp)
 
 RCT_EXTERN_METHOD(consumeKeys: (BOOL)willConsume)
 
+RCT_EXTERN_METHOD(sendNotification: (NSString)title payload:(NSString)payload url:(NSString)url)
+
 @end

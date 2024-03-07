@@ -8,6 +8,7 @@
 import Foundation
 import Cocoa
 import SwiftUI
+import UserNotifications
 
 class WindowDelegate: NSObject, NSWindowDelegate {
   var resignHandler: (() -> Void)?
@@ -39,7 +40,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   public var consumeKeys: Bool = false;
 
   func applicationDidFinishLaunching(_ aNotification: Notification) {
-    
     let jsCodeLocation: URL
     #if DEBUG
       jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
@@ -72,6 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     self.windowDelegate = WindowDelegate(resignHandler: { self.hidePopover() })
     popover.delegate = self.windowDelegate
     
+    // Menu Bar Item
     statusBarItem = NSStatusBar.system.statusItem(withLength: CGFloat(NSStatusItem.variableLength))
     if let button = self.statusBarItem.button {
       button.action = #selector(togglePopover(_:))
@@ -86,6 +87,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       button.frame = iconView.frame
     }
 
+    // Global Key Handler
     NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
       if let appBridge = self.getBridge() {
         let key = String(utf8String: $0.characters?.cString(using: String.Encoding.utf8) ?? [CChar(0)])
@@ -93,6 +95,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       }
       
       return self.consumeKeys ? nil : $0
+    }
+    
+    // Notifications
+    UNUserNotificationCenter.current().delegate = self
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+      if settings.authorizationStatus != .authorized {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { (authorized, error) in
+          if (!authorized) {
+            print("Notifications Disabled")
+          }
+        }
+      }
     }
   }
   
@@ -164,5 +178,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     return nil
+  }
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    return completionHandler([.list, .sound])
   }
 }

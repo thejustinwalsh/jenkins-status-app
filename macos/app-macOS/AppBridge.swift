@@ -7,6 +7,7 @@
 
 import Foundation
 import LaunchAtLogin
+import UserNotifications
 
 @objc(AppBridge)
 class AppBridge: RCTEventEmitter {  
@@ -73,6 +74,23 @@ class AppBridge: RCTEventEmitter {
     DispatchQueue.main.async {
       let appDelegate = NSApp.delegate as? AppDelegate
       appDelegate?.consumeKeys = willConsume
+    }
+  }
+
+  // ~/Library/Preferences/com.apple.ncprefs.plist
+  // defaults write com.apple.ncprefs.plist ... (auth)
+  @objc func sendNotification(_ title: NSString, payload: NSString, url: NSString) {
+    let notify = UNUserNotificationCenter.current()
+    notify.getNotificationSettings { (settings) in
+      if settings.authorizationStatus == .authorized {
+        let content = UNMutableNotificationContent()
+        content.title = title as String
+        content.body = payload as String
+        content.sound = UNNotificationSound.default
+        
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+        notify.add(request);
+      }
     }
   }
 }
