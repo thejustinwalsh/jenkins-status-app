@@ -16,13 +16,12 @@ import {
 import type {PropsWithoutMediaStyles} from '@tamagui/web';
 import type {ListItemProps, ProgressProps, TamaguiElement} from 'tamagui';
 
-type CustomListItemProps = ListItemProps &
-  Pick<ProgressProps, 'value' | 'max'> & {
-    hasProgress?: boolean;
-  };
+type CustomListItemProps = Pick<ProgressProps, 'value' | 'max'> & {
+  hasProgress?: boolean;
+} & ListItemProps;
 
 const useListItem = (
-  propsIn: ListItemProps,
+  propsIn: CustomListItemProps,
   {
     Text = ListItemText,
     Subtitle = ListItemSubtitle,
@@ -32,7 +31,7 @@ const useListItem = (
     Subtitle?: any;
     Text?: any;
   } = {Text: ListItemText, Subtitle: ListItemSubtitle, Title: ListItemTitle},
-): {props: PropsWithoutMediaStyles<ListItemProps>} => {
+): {props: PropsWithoutMediaStyles<CustomListItemProps>} => {
   // careful not to destructure and re-order props, order is important
   const props = useProps(propsIn);
 
@@ -55,6 +54,11 @@ const useListItem = (
     letterSpacing,
     textAlign,
     ellipse,
+
+    // progress props
+    value,
+    max,
+    hasProgress,
 
     ...rest
   } = props;
@@ -104,7 +108,9 @@ const useListItem = (
               ) : (
                 <Title size={size}>{title}</Title>
               )}
-              {subTitle ? (
+              {hasProgress ? (
+                <ListItemProgress value={value} max={max} />
+              ) : subTitle ? (
                 <>
                   {typeof subTitle === 'string' && noTextWrap !== 'all' ? (
                     // TODO: can use theme but we need to standardize to alt themes
@@ -135,7 +141,7 @@ const useListItem = (
 };
 
 function ListItemProgress({value, max}: ProgressProps) {
-  return () => (
+  return (
     <YStack height="$0.75" marginVertical="$2">
       <Progress size="small" opacity={0.5} value={value} max={max}>
         <Progress.Indicator animation="quick" />
@@ -144,15 +150,18 @@ function ListItemProgress({value, max}: ProgressProps) {
   );
 }
 
-export default themeable(
+const StatusListItem = themeable(
   forwardRef<TamaguiElement, CustomListItemProps>((propsIn, ref) => {
-    const {hasProgress, value, max, ...listItemProps} = propsIn;
+    const {...listItemProps} = propsIn;
+
     const {props} = useListItem(listItemProps, {
       Title: ListItemTitle,
       Text: ListItemText,
-      Subtitle: hasProgress ? ListItemProgress({value, max}) : ListItemSubtitle,
+      Subtitle: undefined,
     });
 
     return <ListItemFrame {...props} ref={ref} />;
   }),
 );
+
+export default StatusListItem;

@@ -10,6 +10,7 @@ import {
 import RelativeTime from '@yaireo/relative-time';
 
 import ListItem from '@app/components/StatusListItem';
+import {useProjectNotifier} from '@app/hooks/useProjectNotifier';
 import {useProject} from '@app/hooks/useProjects';
 import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
 import appBridge from '@app/lib/native';
@@ -39,6 +40,8 @@ export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
     return (
       <ListItem
         key={id}
+        id={id}
+        noTextWrap
         hoverTheme={defaults.hoverTheme}
         pressTheme={defaults.pressTheme}
         overflow="hidden"
@@ -76,12 +79,18 @@ export function ProjectListItemBuild({
   const [value, setValue] = useState<number | undefined>();
   const [subTitle, setSubTitle] = useState<string | undefined>();
 
+  // TODO: maybe project notifications should be a service?
+  // - We don't want the notifications to be dependent of the screen you are on
+  useProjectNotifier(id);
+
   const variant = useMemo(() => {
     // eslint-disable-next-line no-void -- ensure we update when new data is available
     void isValidating;
 
     return build?.inProgress ? 'progress' : 'default';
   }, [build?.inProgress, isValidating]);
+
+  const hasProgress = useMemo(() => variant === 'progress', [variant]);
 
   const status = useMemo(() => {
     // eslint-disable-next-line no-void -- ensure we update when new data is available
@@ -108,25 +117,27 @@ export function ProjectListItemBuild({
   // TODO: make this a custom hook for smooth progress updates
   useEffect(() => {
     let req: number = -1;
+
+    const updateProgress = () => {
+      const timestamp = build?.timestamp ?? Date.now();
+      const estimatedDuration = build?.estimatedDuration ?? 0;
+      const progress = Math.max(
+        0,
+        Math.min(
+          ((Date.now() - timestamp) / estimatedDuration) * defaults.max,
+          defaults.max,
+        ),
+      );
+      setValue(progress);
+      req = setTimeout(updateProgress, 60) as unknown as number;
+    };
+
     if (variant === 'progress' && build && build.inProgress) {
-      const updateProgress = () => {
-        setValue(
-          Math.max(
-            0,
-            Math.min(
-              ((Date.now() - build.timestamp) / build.estimatedDuration) *
-                defaults.max,
-              defaults.max,
-            ),
-          ),
-        );
-        req = requestAnimationFrame(updateProgress);
-      };
       updateProgress();
     } else if (req !== -1) {
-      cancelAnimationFrame(req);
+      clearTimeout(req);
     }
-    return () => cancelAnimationFrame(req);
+    return () => clearTimeout(req);
   }, [build, variant]);
 
   // TODO: make this a custom hook for updating the project timestamps
@@ -167,6 +178,8 @@ export function ProjectListItemBuild({
   return (
     <ListItem
       key={id}
+      id={id}
+      noTextWrap
       hoverTheme={defaults.hoverTheme}
       pressTheme={defaults.pressTheme}
       overflow="hidden"
@@ -178,7 +191,7 @@ export function ProjectListItemBuild({
       iconAfter={ChevronRight}
       title={title}
       subTitle={subTitle ?? ' '}
-      hasProgress={variant === 'progress'}
+      hasProgress={hasProgress}
       value={value}
       max={defaults.max}
       onPress={onPress}

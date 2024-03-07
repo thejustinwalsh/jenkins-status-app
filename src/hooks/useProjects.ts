@@ -46,7 +46,7 @@ export function useProjects() {
 
 export function useProject(id: string) {
   const [index, setIndex] = useProjects();
-  const idx = index.find(i => i.id === id);
+  const idx = useMemo(() => index.find(i => i.id === id), [index, id]);
   const projectConfig = useMemo(
     () =>
       idx
