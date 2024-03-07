@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import {PortalProvider, YGroup} from 'tamagui';
+import {YGroup} from 'tamagui';
 
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import CommandPalette from '@app/components/CommandPalette';
@@ -133,35 +133,33 @@ export default function HomeScreen({
   }, [toggleKeyEvents]);
 
   return (
-    <PortalProvider>
-      <AutoSizeStack
-        snap={snapLayout}
-        minWidth={400}
-        minHeight={50}
-        backgroundColor="$background">
-        <YGroup>
-          <YGroup.Item>
-            <CommandPalette
-              isVisible={showCommandPalette}
-              terms={searchTerms}
-              commands={commands}
-              mode={commandPaletteMode}
-              onSearchResults={handleSearchResults}
-              onCommandSelected={handleCommandSelected}
-              onClosed={handleCommandPaletteClosed}
+    <AutoSizeStack
+      snap={snapLayout}
+      minWidth={400}
+      minHeight={50}
+      backgroundColor="$background">
+      <YGroup>
+        <YGroup.Item>
+          <CommandPalette
+            isVisible={showCommandPalette}
+            terms={searchTerms}
+            commands={commands}
+            mode={commandPaletteMode}
+            onSearchResults={handleSearchResults}
+            onCommandSelected={handleCommandSelected}
+            onClosed={handleCommandPaletteClosed}
+          />
+        </YGroup.Item>
+        <YGroup.Item>
+          {filteredProjects.map(project => (
+            <ProjectListItem
+              key={project.id}
+              id={project.id}
+              onPress={navigateToDetails(project.id)}
             />
-          </YGroup.Item>
-          <YGroup.Item>
-            {filteredProjects.map(project => (
-              <ProjectListItem
-                key={project.id}
-                id={project.id}
-                onPress={navigateToDetails(project.id)}
-              />
-            ))}
-          </YGroup.Item>
-        </YGroup>
-      </AutoSizeStack>
-    </PortalProvider>
+          ))}
+        </YGroup.Item>
+      </YGroup>
+    </AutoSizeStack>
   );
 }
