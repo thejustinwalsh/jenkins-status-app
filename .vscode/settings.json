@@ -12,10 +12,12 @@
     "mmkv",
     "moti",
     "Podfile",
+    "Pressable",
     "Reactotron",
     "tamagui",
     "tanstack",
     "themeable",
+    "welldone",
     "yaireo"
   ],
   "files.associations": {

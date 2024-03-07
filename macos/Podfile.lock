@@ -11,9 +11,9 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.73.17)
   - fmt (9.1.0)
   - glog (0.3.5)
-  - hermes-engine (0.73.4):
-    - hermes-engine/Pre-built (= 0.73.4)
-  - hermes-engine/Pre-built (0.73.4)
+  - hermes-engine (0.73.5):
+    - hermes-engine/Pre-built (= 0.73.5)
+  - hermes-engine/Pre-built (0.73.5)
   - libevent (2.1.12)
   - MMKV (1.3.3):
     - MMKVCore (~> 1.3.3)
@@ -1249,7 +1249,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 7a2f7ed68ebf798bb5f368669661b99308a7be2d
   fmt: 03574da4b7ba40de39da59677ca66610ce8c4a02
   glog: 3a72874c0322c7caf24931d3a2777cb7a3090529
-  hermes-engine: b2669ce35fc4ac14f523b307aff8896799829fe2
+  hermes-engine: 1d1835b2cc54c381909d94d1b3c8e0a2f1a94a0e
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   MMKV: f902fb6719da13c2ab0965233d8963a59416f911
   MMKVCore: d26e4d3edd5cb8588c2569222cbd8be4231374e9

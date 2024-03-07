@@ -1,4 +1,4 @@
-import {createAnimations} from '@tamagui/animations-moti';
+import {createAnimations} from '@tamagui/animations-react-native';
 import {config} from '@tamagui/config';
 import {createTamagui} from 'tamagui'; // or '@tamagui/core'
 
