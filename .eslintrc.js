@@ -43,4 +43,12 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['jest/*.js', '**/*.spec.js', '**/*.spec.jsx'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
 };

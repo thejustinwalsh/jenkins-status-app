@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 
-import {appBridge} from '../lib/native/app-bridge';
+import appBridge from '@app/lib/native';
 
 export type KeyEvent = {
   key: String;
