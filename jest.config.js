@@ -11,6 +11,7 @@ module.exports = {
     'node_modules/(?!(jest-)?react-native|@react-native|@react-navigation|react-itertools)',
   ],
   moduleDirectories: ['node_modules', 'src'],
+  clearMocks: true,
   collectCoverage: true,
   collectCoverageFrom: ['**/*.{js,ts,jsx,tsx}', '!**/*.d.ts'],
 };

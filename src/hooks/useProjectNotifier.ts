@@ -6,7 +6,7 @@ import {atomWithStorage} from '@app/lib/storage';
 import {useProject} from './useProjects';
 import {useBuildState, useProjectState} from './useProjectState';
 
-type NotificationState = {
+export type NotificationState = {
   build: number;
   notifiedOn: number;
   status: 'success' | 'failure' | 'stalled';
@@ -25,6 +25,7 @@ export function useProjectNotifier(id: string) {
       }),
     [id],
   );
+
   const [notification, setNotification] = useAtom(notificationConfig);
 
   // Determine if we should notify
@@ -59,7 +60,7 @@ export function useProjectNotifier(id: string) {
         );
       }
     } else if (
-      notification.status === 'success' &&
+      pending.status === 'success' &&
       pending.status !== notification.status
     ) {
       if (project.notifications.onSuccess) {
@@ -70,7 +71,7 @@ export function useProjectNotifier(id: string) {
         );
       }
     } else if (
-      notification.status === 'stalled' &&
+      pending.status === 'stalled' &&
       pending.status !== notification.status
     ) {
       // TODO: add onStalled notification setting
