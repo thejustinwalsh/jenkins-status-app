@@ -57,10 +57,10 @@ jest.mock('./useProjectState', () => ({
   useProjectState: jest.fn((id: string): {project: ProjectStatus} => ({
     project: {
       id: id,
-      name: 'Notify Success',
-      description: 'Notify on success',
+      name: 'Test Project',
+      description: 'Test Description',
       healthReport: [{description: 'Success', score: 100}],
-      fullDisplayName: 'Notify Success',
+      fullDisplayName: 'Test Project',
       inQueue: false,
       disabled: false,
       lastBuild: {
