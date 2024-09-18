@@ -5,19 +5,21 @@ import {YGroup} from 'tamagui';
 import AutoSizeStack from '@app/components/AutoSizeStack';
 import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
-import {useKeyEvents} from '@app/hooks/useKeyEvents';
+import {useKeyDown} from '@app/contexts/AppContext';
 import {useProjects} from '@app/hooks/useProjects';
 import appBridge from '@app/lib/native';
+import storage from '@app/lib/storage';
 
 import type {SearchSet} from '@app/components/SearchableInput';
-import type {KeyEvent} from '@app/hooks/useKeyEvents';
+import type {KeyEvent} from '@app/contexts/AppContext';
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 type Commands = 'add' | 'remove' | 'refresh' | 'settings' | 'help' | 'quit';
+type DevCommands = 'reset';
 
 type CommandSet = SearchSet & {
-  key: React.Key & Commands;
+  key: React.Key & (Commands | DevCommands);
   macos?: string;
   windows?: string;
 };
@@ -29,6 +31,10 @@ const commands: CommandSet[] = [
   {key: 'help', value: 'Help'},
   {key: 'quit', value: 'Quit', windows: 'Exit'},
 ];
+
+if (__DEV__) {
+  commands.push({key: 'reset', value: 'Reset (DEV)'});
+}
 
 export default function HomeScreen({
   navigation,
@@ -62,20 +68,20 @@ export default function HomeScreen({
     }
   }, []);
 
-  const toggleKeyEvents = useKeyEvents(handleKeyEvents, false);
+  const {setConsumeKeys} = useKeyDown(handleKeyEvents);
   useFocusEffect(
     useCallback(() => {
-      toggleKeyEvents(true);
+      setConsumeKeys(true);
       return () => {
-        toggleKeyEvents(false);
+        setConsumeKeys(false);
         setShowCommandPalette(false);
       };
-    }, [toggleKeyEvents]),
+    }, [setConsumeKeys]),
   );
 
   useEffect(
-    () => toggleKeyEvents(!showCommandPalette),
-    [toggleKeyEvents, showCommandPalette],
+    () => setConsumeKeys(!showCommandPalette),
+    [setConsumeKeys, showCommandPalette],
   );
 
   const searchTerms = useMemo(
@@ -105,7 +111,7 @@ export default function HomeScreen({
   // TODO: Implement command navigation and list refresh commands
   const handleCommandSelected = useCallback(
     (command: React.Key) => {
-      switch (command) {
+      switch (command as Commands) {
         case 'add':
           // TODO: Quick hack for adding new projects, nav to settings screen with this data?
           addProject('New Project');
@@ -123,14 +129,22 @@ export default function HomeScreen({
           appBridge.closeApp();
           break;
       }
+
+      if (__DEV__) {
+        switch (command as DevCommands) {
+          case 'reset':
+            storage.clearAll();
+            break;
+        }
+      }
     },
     [addProject],
   );
 
   const handleCommandPaletteClosed = useCallback(() => {
     setShowCommandPalette(false);
-    toggleKeyEvents(true);
-  }, [toggleKeyEvents]);
+    setConsumeKeys(true);
+  }, [setConsumeKeys]);
 
   return (
     <AutoSizeStack

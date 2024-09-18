@@ -3,6 +3,7 @@ module.exports = {
   plugins: ['import'],
   extends: ['@react-native', 'plugin:react/jsx-runtime'],
   rules: {
+    'no-void': ['error', {allowAsStatement: true}],
     'react-native/no-inline-styles': 'off',
     '@typescript-eslint/consistent-type-imports': 'error',
     'sort-imports': [

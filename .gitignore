@@ -71,3 +71,6 @@ yarn-error.log
 
 # Xcode local env settins 
 .xcode.env.local
+
+# Local env settings
+.env.local

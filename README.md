@@ -84,3 +84,10 @@ To learn more about React Native, take a look at the following resources:
 - [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
 - [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
 - [React Native Directory](https://reactnative.directory) - find native modules that support all of your target platforms.
+
+
+## TODO
+- [ ] Store credentials per jenkins instance / site. When you add a project, it should just be using the credentials for that server's URL, and it should not be stored with each project.
+- [ ] Onboarding experience should ask you for a URL and Auth Tokens, and store those credentials in the keychain, if login is successful. Once a site has been added, it should flow you to the list of projects available on that site.
+- [ ] Adding a project should always present the list of available projects on the site.
+- [ ] Quick links to start a build for a project in the details panel

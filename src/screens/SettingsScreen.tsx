@@ -101,7 +101,6 @@ export default function SettingsScreen({
                   icon={KeySquare}
                   value={project.auth.password}
                   onChangeText={value => dispatch({type: 'password', value})}
-                  onPr
                 />
               </XStack>
             </YGroup.Item>

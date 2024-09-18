@@ -9,7 +9,7 @@ import {
 } from '@tamagui/lucide-icons';
 import RelativeTime from '@yaireo/relative-time';
 
-import ListItem from '@app/components/StatusListItem';
+import StatusListItem from '@app/components/StatusListItem';
 import {useProjectNotifier} from '@app/hooks/useProjectNotifier';
 import {useProject} from '@app/hooks/useProjects';
 import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
@@ -38,7 +38,7 @@ export default function ProjectListItem({id, onPress}: ProjectListItemProps) {
 
   if (isLoading || state === undefined) {
     return (
-      <ListItem
+      <StatusListItem
         key={id}
         id={id}
         noTextWrap
@@ -84,7 +84,7 @@ export function ProjectListItemBuild({
   useProjectNotifier(id);
 
   const variant = useMemo(() => {
-    // eslint-disable-next-line no-void -- ensure we update when new data is available
+    // ensure we update when new data is available
     void isValidating;
 
     return build?.inProgress ? 'progress' : 'default';
@@ -93,7 +93,7 @@ export function ProjectListItemBuild({
   const hasProgress = useMemo(() => variant === 'progress', [variant]);
 
   const status = useMemo(() => {
-    // eslint-disable-next-line no-void -- ensure we update when new data is available
+    // ensure we update when new data is available
     void isValidating;
 
     if (isLoading) {
@@ -176,7 +176,7 @@ export function ProjectListItemBuild({
   }, [build, variant]);
 
   return (
-    <ListItem
+    <StatusListItem
       key={id}
       id={id}
       noTextWrap

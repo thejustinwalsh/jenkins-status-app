@@ -15,8 +15,10 @@ import '@app/lib/intl';
 import ThemedNavigationContainer from '@app/components/ThemedNavigationContainer';
 import DetailsScreen from '@app/screens/DetailsScreen';
 import HomeScreen from '@app/screens/HomeScreen';
+import ProjectSelectionScreen from '@app/screens/ProjectSelectionScreen';
 import SettingsScreen from '@app/screens/SettingsScreen';
 import WelcomeScreen from '@app/screens/WelcomeScreen';
+import {AppProvider} from './contexts/AppContext';
 import {useProjects} from './hooks/useProjects';
 import config from './tamagui.config';
 
@@ -24,7 +26,7 @@ import type {StackProps} from '@app/navigation/params';
 import type {StackNavigationOptions} from '@react-navigation/stack';
 
 // TODO: Expo Dev-Plugins for fetch
-if (__DEV__) {
+if (false /*__DEV__*/) {
   XHRInterceptor.enableInterception();
   XHRInterceptor.setResponseCallback(
     (
@@ -54,15 +56,15 @@ if (__DEV__) {
 const Stack = createStackNavigator<StackProps>();
 const screenOptions: StackNavigationOptions = {
   headerShown: false,
-  animationEnabled: true,
+  animationEnabled: false,
   detachPreviousScreen: true,
   gestureEnabled: false,
   cardStyle: {flex: 1},
-  cardStyleInterpolator: ({current}) => ({
-    cardStyle: {
-      opacity: current.progress,
-    },
-  }),
+  //cardStyleInterpolator: ({current}) => ({
+  //  cardStyle: {
+  //    opacity: current.progress,
+  //  },
+  //}),
 };
 
 function App(): JSX.Element {
@@ -87,15 +89,21 @@ function App(): JSX.Element {
           }}>
           <TamaguiProvider config={config} disableInjectCSS defaultTheme="dark">
             <ThemedNavigationContainer>
-              <Stack.Navigator
-                initialRouteName={initialRouteName}
-                detachInactiveScreens
-                screenOptions={screenOptions}>
-                <Stack.Screen name="Welcome" component={WelcomeScreen} />
-                <Stack.Screen name="Home" component={HomeScreen} />
-                <Stack.Screen name="Details" component={DetailsScreen} />
-                <Stack.Screen name="Settings" component={SettingsScreen} />
-              </Stack.Navigator>
+              <AppProvider>
+                <Stack.Navigator
+                  initialRouteName={initialRouteName}
+                  detachInactiveScreens
+                  screenOptions={screenOptions}>
+                  <Stack.Screen name="Welcome" component={WelcomeScreen} />
+                  <Stack.Screen
+                    name="ProjectSelection"
+                    component={ProjectSelectionScreen}
+                  />
+                  <Stack.Screen name="Home" component={HomeScreen} />
+                  <Stack.Screen name="Details" component={DetailsScreen} />
+                  <Stack.Screen name="Settings" component={SettingsScreen} />
+                </Stack.Navigator>
+              </AppProvider>
             </ThemedNavigationContainer>
           </TamaguiProvider>
         </SWRConfig>
