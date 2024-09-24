@@ -26,51 +26,73 @@ class WindowDelegate: NSObject, NSWindowDelegate {
   }
 }
 
+class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    return completionHandler([.list, .sound])
+  }
+}
+
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: MacAppDelegate {
+  var appBridge: AppBridge! = AppBridge()
+  var notificationDelegate: NotificationDelegate! = NotificationDelegate();
   var windowDelegate: WindowDelegate!
   var popover: NSWindow!
   var statusBarItem: NSStatusItem!
   var viewController: NSViewController!
-  var rootView: RCTRootView!
-  var bridge: AppBridge?
+  var rootView: NSView!;
   var popoverWidth: Int = 400
   var popoverHeight: Int = 400
   
   public var consumeKeys: Bool = false;
-
-  func applicationDidFinishLaunching(_ aNotification: Notification) {
-    let jsCodeLocation: URL
+  
+  override func bundleURL() -> URL? {
+    let url: URL
     #if DEBUG
-      jsCodeLocation = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+      url = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")!
     #else
-      jsCodeLocation = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
+      url = Bundle.main.url(forResource: "main", withExtension: "jsbundle")!
     #endif
     
-    viewController = NSViewController()
-    rootView = RCTRootView(bundleURL: jsCodeLocation, moduleName: "app", initialProperties: nil, launchOptions: nil)
-    viewController.view = rootView
-    rootView.backgroundColor = NSColor.black
-
+    return url;
+  }
+  
+  override func createWindow(_ rootView: NSView!) -> NSWindow! {
+    viewController = NSViewController();
+    
+    self.rootView = rootView;
+    viewController.view = self.rootView;
+    
+    if let layer = rootView.layer {
+      layer.backgroundColor = NSColor.black.cgColor;
+    }
+    
     popover = NSWindow(
       contentRect: NSRect(x: 0, y: 0, width: popoverWidth, height: popoverHeight),
       styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered,
       defer: false
-    )
-    popover.titlebarAppearsTransparent = true
-    popover.titleVisibility = .hidden
-    popover.isMovableByWindowBackground = false
-    popover.isReleasedWhenClosed = false
-    popover.styleMask.remove(.resizable)
-    popover.collectionBehavior = [.transient, .ignoresCycle]
-    popover.standardWindowButton(.closeButton)?.isHidden = true
-    popover.standardWindowButton(.zoomButton)?.isHidden = true
-    popover.standardWindowButton(.miniaturizeButton)?.isHidden = true
-    popover.contentViewController = viewController
+    );
+    popover.titlebarAppearsTransparent = true;
+    popover.titleVisibility = .hidden;
+    popover.isMovableByWindowBackground = false;
+    popover.isReleasedWhenClosed = false;
+    popover.styleMask.remove(.resizable);
+    popover.collectionBehavior = [.transient, .ignoresCycle];
+    popover.standardWindowButton(.closeButton)?.isHidden = true;
+    popover.standardWindowButton(.zoomButton)?.isHidden = true;
+    popover.standardWindowButton(.miniaturizeButton)?.isHidden = true;
+    popover.contentViewController = viewController;
     
-    self.windowDelegate = WindowDelegate(resignHandler: { self.hidePopover() })
-    popover.delegate = self.windowDelegate
+    self.windowDelegate = WindowDelegate(resignHandler: { self.hidePopover() });
+    popover.delegate = self.windowDelegate;
+    
+    return popover;
+  }
+
+  override func applicationDidFinishLaunching(_ aNotification: Notification) {
+    self.moduleName = "app";
+    super.applicationDidFinishLaunching(aNotification);
     
     // Menu Bar Item
     statusBarItem = NSStatusBar.system.statusItem(withLength: CGFloat(NSStatusItem.variableLength))
@@ -89,16 +111,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     // Global Key Handler
     NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
-      if let appBridge = self.getBridge() {
-        let key = String(utf8String: $0.characters?.cString(using: String.Encoding.utf8) ?? [CChar(0)])
-        appBridge.sendKeyDownEvent(key: key, keyCode: $0.keyCode)
-      }
-      
+      let key = String(utf8String: $0.characters?.cString(using: String.Encoding.utf8) ?? [CChar(0)])
+      self.appBridge.sendKeyDownEvent(key: key, keyCode: $0.keyCode)
       return self.consumeKeys ? nil : $0
     }
     
     // Notifications
-    UNUserNotificationCenter.current().delegate = self
+    UNUserNotificationCenter.current().delegate = notificationDelegate
     UNUserNotificationCenter.current().getNotificationSettings { (settings) in
       if settings.authorizationStatus != .authorized {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { (authorized, error) in
@@ -110,7 +129,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
   }
   
-  @objc func setBackgroundColor(_ hex: String) {
+  func setBackgroundColor(_ hex: String) {
     let hexString = hex.trimmingCharacters(in: .whitespacesAndNewlines)
     let scanner = Scanner(string: hexString)
     if (hexString.hasPrefix("#")) {
@@ -122,22 +141,23 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let g = CGFloat((color & 0x00FF00) >> 8) / 255.0
     let b = CGFloat(color & 0x0000FF) / 255.0
 
-    rootView.backgroundColor = NSColor(red: r, green: g, blue: b, alpha: 1)
+    if let layer = rootView.layer {
+      layer.backgroundColor = NSColor(red: r, green: g, blue: b, alpha: 1).cgColor;
+    }
   }
 
-  @objc func resize(_ width: Int, height: Int) {
+  func resize(_ width: Int, height: Int) {
     popoverWidth = width;
     popoverHeight = height;
     popover.setContentSize(NSSize(width: popoverWidth, height: popoverHeight))
   }
 
-  @objc func togglePopover(_ sender: AnyObject?) {
+  @objc
+  func togglePopover(_ sender: AnyObject?) {
     if self.popover.isVisible && self.popover.isKeyWindow {
       self.popover.close()
       
-      if let appBridge = self.getBridge() {
-        appBridge.sendPopoverStateEvent(isVisible: false)
-      }
+      //appBridge.sendPopoverStateEvent(isVisible: false)
     } else {
       self.popover.makeKeyAndOrderFront(self)
       self.popover.center()
@@ -152,37 +172,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       let frame = NSRect(origin: origin, size: size)
       self.popover.setFrame(frame, display: true)
 
-      if let appBridge = self.getBridge() {
-        appBridge.sendPopoverStateEvent(isVisible: true)
-      }
+      appBridge.sendPopoverStateEvent(isVisible: true)
     }
   }
 
-  @objc func hidePopover() {
+  func hidePopover() {
     if self.popover.isVisible {
       self.popover.close()
     }
   }
 
-  @objc func closeApp() {
+  @objc
+  func closeApp() {
     NSApp.terminate(nil)
   }
   
-  @objc func getBridge() -> AppBridge? {
-    if let cachedBridge = bridge { return cachedBridge }
-        
-    if self.rootView.bridge.moduleIsInitialized(AppBridge.classForCoder()) {
-      if let appBridge = self.rootView.bridge.module(for: AppBridge.classForCoder()) as? AppBridge {
-        return appBridge
-      }
-    }
-    
-    return nil
+  @objc
+  func getBridge() -> AppBridge {
+    return self.appBridge;
   }
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate {
-  func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    return completionHandler([.list, .sound])
-  }
-}

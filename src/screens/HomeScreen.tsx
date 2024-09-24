@@ -7,8 +7,8 @@ import CommandPalette from '@app/components/CommandPalette';
 import ProjectListItem from '@app/components/ProjectListItem';
 import {useKeyDown} from '@app/contexts/AppContext';
 import {useProjects} from '@app/hooks/useProjects';
-import appBridge from '@app/lib/native';
 import storage from '@app/lib/storage';
+import appBridge from '@app/modules/NativeAppBridge';
 
 import type {SearchSet} from '@app/components/SearchableInput';
 import type {KeyEvent} from '@app/contexts/AppContext';
@@ -126,7 +126,7 @@ export default function HomeScreen({
           //navigation.navigate('Help');
           break;
         case 'quit':
-          appBridge.closeApp();
+          appBridge?.closeApp();
           break;
       }
 

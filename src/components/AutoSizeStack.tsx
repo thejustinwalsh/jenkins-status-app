@@ -3,7 +3,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {YStack} from 'tamagui';
 import {useDebouncedCallback} from 'use-debounce';
 
-import appBridge from '@app/lib/native';
+import appBridge from '@app/modules/NativeAppBridge';
 
 import type {LayoutChangeEvent, LayoutRectangle} from 'react-native';
 
@@ -51,7 +51,7 @@ const AutoSizeStack = React.forwardRef<typeof YStack, AutoSizeStackProps>(
 
     useLayoutEffect(() => {
       if (isFocused && width && height) {
-        appBridge.resize(width, height);
+        appBridge?.resize(width, height);
       }
     }, [width, height, isFocused]);
 

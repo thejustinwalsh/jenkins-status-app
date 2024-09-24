@@ -1,0 +1,66 @@
+diff --git a/apple/LayoutReanimation/REASwizzledUIManager.mm b/apple/LayoutReanimation/REASwizzledUIManager.mm
+index 16a25aea62b2e40eec02bbb89a09e9f7ebdf5d07..b0896bd2babc7779c72ab63bc870bc85aa9a7135 100644
+--- a/apple/LayoutReanimation/REASwizzledUIManager.mm
++++ b/apple/LayoutReanimation/REASwizzledUIManager.mm
+@@ -232,7 +232,7 @@ std::atomic<bool> hasPendingBlocks;
+   }
+ 
+   // Perform layout (possibly animated)
+-  return ^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, REAUIView *> *viewRegistry) {
++  return ^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, REAPlatformView *> *viewRegistry) {
+     const RCTFrameData *frameDataArray = (const RCTFrameData *)framesData.bytes;
+     RCTLayoutAnimationGroup *layoutAnimationGroup = [uiManager valueForKey:@"_layoutAnimationGroup"];
+ 
+@@ -372,7 +372,7 @@ std::atomic<bool> hasPendingBlocks;
+     ++isFlushingBlocks;
+     hasPendingBlocks = false;
+     [self reanimated_addUIBlock:^(
+-              __unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAUIView *> *viewRegistry) {
++              __unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAPlatformView *> *viewRegistry) {
+       --isFlushingBlocks;
+     }];
+   }
+diff --git a/apple/REAModule.mm b/apple/REAModule.mm
+index 4148ea54e269d7a65731b6dc4bd31055982ae80c..1ed5232d34c5fbfa5fbe974a49ca2f25a2aba8ea 100644
+--- a/apple/REAModule.mm
++++ b/apple/REAModule.mm
+@@ -237,7 +237,7 @@ RCT_EXPORT_MODULE(ReanimatedModule);
+   REANodesManager *nodesManager = _nodesManager;
+ 
+   [uiManager
+-      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAUIView *> *viewRegistry) {
++      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAPlatformView *> *viewRegistry) {
+         for (AnimatedOperation operation in operations) {
+           operation(nodesManager);
+         }
+diff --git a/apple/REANodesManager.mm b/apple/REANodesManager.mm
+index 4fa8f448a4f560c61cb51efdc9ca90ac9b4005c6..161a045aa3cf4114d196acb2d9f73a2480b8e4d1 100644
+--- a/apple/REANodesManager.mm
++++ b/apple/REANodesManager.mm
+@@ -573,7 +573,7 @@ using namespace facebook::react;
+ 
+   __weak __typeof__(self) weakSelf = self;
+   [_uiManager
+-      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAUIView *> *viewRegistry) {
++      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, REAPlatformView *> *viewRegistry) {
+         __typeof__(self) strongSelf = weakSelf;
+         if (strongSelf == nil) {
+           return;
+diff --git a/apple/REAUIKit.h b/apple/REAUIKit.h
+index 12429f39bf0dccf51c635fee14ac9d6cecd424dd..5a3f0f7543643c0948bc1e5bf53f866ba5236230 100644
+--- a/apple/REAUIKit.h
++++ b/apple/REAUIKit.h
+@@ -3,11 +3,13 @@
+ #import <UIKit/UIKit.h>
+ 
+ typedef UIView REAUIView;
++typedef UIView REAPlatformView;
+ 
+ #else // TARGET_OS_OSX [
+ 
+ #import <RNReanimated/RCTUIView+Reanimated.h>
+ 
+ typedef RCTUIView REAUIView;
++typedef RCTPlatformView REAPlatformView;
+ 
+ #endif // ] TARGET_OS_OSX

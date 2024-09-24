@@ -1,0 +1,99 @@
+diff --git a/apple/RNGHUIKit.h b/apple/RNGHUIKit.h
+index dc0b742ca2f7f7e6e1bf3fe940df1223cfb77049..bfc023775e6adebd6186b1f387118d785458069f 100644
+--- a/apple/RNGHUIKit.h
++++ b/apple/RNGHUIKit.h
+@@ -3,6 +3,7 @@
+ #import <UIKit/UIKit.h>
+ 
+ typedef UIView RNGHUIView;
++typedef UIView RNGHPlatformView;
+ typedef UITouch RNGHUITouch;
+ typedef UIScrollView RNGHUIScrollView;
+ 
+@@ -17,6 +18,7 @@ typedef UIScrollView RNGHUIScrollView;
+ #import <React/RCTUIKit.h>
+ 
+ typedef RCTUIView RNGHUIView;
++typedef RCTPlatformView RNGHPlatformView;
+ typedef RCTUITouch RNGHUITouch;
+ typedef NSScrollView RNGHUIScrollView;
+ 
+diff --git a/apple/RNGestureHandlerButtonComponentView.h b/apple/RNGestureHandlerButtonComponentView.h
+index f1cbdd9ed58f6419324fe7aca7298249f6fe1d4a..827f75e847bad998612a8bdcae706b69118fd3be 100644
+--- a/apple/RNGestureHandlerButtonComponentView.h
++++ b/apple/RNGestureHandlerButtonComponentView.h
+@@ -1,7 +1,15 @@
+ #ifdef RCT_NEW_ARCH_ENABLED
+ 
++#if !TARGET_OS_OSX
++
+ #import <UIKit/UIKit.h>
+ 
++#else
++
++#import <React/RCTUIKit.h>
++
++#endif
++
+ #import <React/RCTViewComponentView.h>
+ 
+ #import "RNGestureHandlerButton.h"
+diff --git a/apple/RNGestureHandlerButtonComponentView.mm b/apple/RNGestureHandlerButtonComponentView.mm
+index ad9ff3e0667d45af92dc799573fafa9c4362e767..a5547e2c9d8dc4363a62338d2540fd59244a5f3c 100644
+--- a/apple/RNGestureHandlerButtonComponentView.mm
++++ b/apple/RNGestureHandlerButtonComponentView.mm
+@@ -18,7 +18,7 @@ using namespace facebook::react;
+ @end
+ 
+ @implementation RNGestureHandlerButtonComponentView {
+-  RNGestureHandlerButton *_buttonView;
++  RNGestureHandlerButton<RCTComponentViewProtocol> *_buttonView;
+ }
+ 
+ // Needed because of this: https://github.com/facebook/react-native/pull/37274
+@@ -32,7 +32,7 @@ using namespace facebook::react;
+   if (self = [super initWithFrame:frame]) {
+     static const auto defaultProps = std::make_shared<const RNGestureHandlerButtonProps>();
+     _props = defaultProps;
+-    _buttonView = [[RNGestureHandlerButton alloc] initWithFrame:self.bounds];
++    _buttonView = [[RNGestureHandlerButton<RCTComponentViewProtocol> alloc] initWithFrame:self.bounds];
+ 
+     self.contentView = _buttonView;
+   }
+@@ -40,12 +40,12 @@ using namespace facebook::react;
+   return self;
+ }
+ 
+-- (void)mountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
++- (void)mountChildComponentView:(RCTUIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+ {
+   [_buttonView mountChildComponentView:childComponentView index:index];
+ }
+ 
+-- (void)unmountChildComponentView:(UIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
++- (void)unmountChildComponentView:(RCTUIView<RCTComponentViewProtocol> *)childComponentView index:(NSInteger)index
+ {
+   [_buttonView unmountChildComponentView:childComponentView index:index];
+ }
+@@ -62,7 +62,7 @@ using namespace facebook::react;
+   const auto &newProps = *std::static_pointer_cast<const RNGestureHandlerButtonProps>(props);
+ 
+   _buttonView.userEnabled = newProps.enabled;
+-#if !TARGET_OS_TV
++#if !TARGET_OS_TV && !TARGET_OS_OSX
+   _buttonView.exclusiveTouch = newProps.exclusive;
+ #endif
+   _buttonView.hitTestEdgeInsets = UIEdgeInsetsMake(
+diff --git a/apple/RNGestureHandlerModule.mm b/apple/RNGestureHandlerModule.mm
+index 4a0ce6939aaa6dcbc9e39af74c06d3d6f9b1383a..188fa286e2c5d415488f0dcc83d241665d51fa12 100644
+--- a/apple/RNGestureHandlerModule.mm
++++ b/apple/RNGestureHandlerModule.mm
+@@ -269,7 +269,7 @@ RCT_EXPORT_METHOD(flushOperations)
+   _operations = [NSMutableArray new];
+ 
+   [uiManager
+-      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, RNGHUIView *> *viewRegistry) {
++      addUIBlock:^(__unused RCTUIManager *manager, __unused NSDictionary<NSNumber *, RNGHPlatformView *> *viewRegistry) {
+         for (GestureHandlerOperation operation in operations) {
+           operation(self->_manager);
+         }

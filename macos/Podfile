@@ -1,3 +1,6 @@
+ENV['USE_HERMES'] = "1"
+ENV['RCT_NEW_ARCH_ENABLED'] = "1"
+
 require_relative '../node_modules/react-native-macos/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
@@ -14,8 +17,6 @@ target 'app-macOS' do
     :path => '../node_modules/react-native-macos',
     :hermes_enabled => true,
     :fabric_enabled => ENV['RCT_NEW_ARCH_ENABLED'] == '1',
-    # Flipper is not compatible w/ macOS
-    :flipper_configuration => FlipperConfiguration.disabled,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )

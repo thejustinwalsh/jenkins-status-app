@@ -10,7 +10,7 @@ import FocusGroup from '@app/components/FocusGroup';
 import BasicInput from '@app/components/IconInput';
 import IconInput from '@app/components/IconInput';
 import {useReducerPipeline} from '@app/hooks/useReducerPipeline';
-import appBridge from '@app/lib/native';
+import appBridge from '@app/modules/NativeAppBridge';
 
 import type {StackProps} from '@app/navigation/params';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -174,7 +174,7 @@ export default function WelcomeScreen({
   }, [navigation, state.password.value, state.url.value, state.user.value]);
 
   const handleQuit = useCallback(() => {
-    appBridge.closeApp();
+    appBridge?.closeApp();
   }, []);
 
   return (

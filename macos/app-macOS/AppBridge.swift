@@ -10,18 +10,12 @@ import LaunchAtLogin
 import UserNotifications
 
 @objc(AppBridge)
-class AppBridge: RCTEventEmitter {  
-  @objc static override func requiresMainQueueSetup() -> Bool {
-    return true
-  }
-
-  @objc override func supportedEvents() -> [String] { ["keyDown", "keyUp", "popover"] }
-  
+class AppBridge: NSObject {
   @objc func launchAtLogin(_ isEnabled: Bool) {
     LaunchAtLogin.isEnabled = isEnabled
   }
 
-  @objc func isLaunchAtLoginEnabled(_ resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
+  @objc func isLaunchAtLoginEnabled(_ resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     resolve(LaunchAtLogin.isEnabled)
   }
   
@@ -49,25 +43,25 @@ class AppBridge: RCTEventEmitter {
   // Key handlers
 
   func sendKeyDownEvent(key: String?, keyCode: UInt16) {
-    sendEvent(withName: "keyDown", body: [
-      "key": key ?? "",
-      "keyCode": keyCode,
-    ])
+    //sendEvent(withName: "keyDown", body: [
+    //  "key": key ?? "",
+    //  "keyCode": keyCode,
+    //])
   }
 
   func sendKeyUpEvent(key: String?, keyCode: UInt16) {
-    sendEvent(withName: "keyUp", body: [
-      "key":  key ?? "",
-      "keyCode": keyCode,
-    ])
+    //sendEvent(withName: "keyUp", body: [
+    //  "key":  key ?? "",
+    //  "keyCode": keyCode,
+    //])
   }
 
   // Window state
 
   func sendPopoverStateEvent(isVisible: Bool) {
-    sendEvent(withName: "popover", body: [
-      "isVisible": isVisible,
-    ])
+    //sendEvent(withName: "popover", body: [
+    //  "isVisible": isVisible,
+    //])
   }
   
   @objc func consumeKeys(_ willConsume: Bool) {

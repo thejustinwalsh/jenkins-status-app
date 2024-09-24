@@ -10,3 +10,5 @@
 #import <React/RCTUtils.h>
 #import <React/RCTConvert.h>
 #import <React/RCTBundleURLProvider.h>
+
+#import "MacAppDelegate.h"

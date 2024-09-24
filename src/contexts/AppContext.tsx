@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import appBridge from '@app/lib/native';
+import appBridge from '@app/modules/NativeAppBridge';
 
 export type PopoverEvent = {
   isActive: boolean;
@@ -29,6 +29,8 @@ const listeners: EventListeners = {
   onPopover: [],
 };
 
+// TODO: Add listeners for keyDown, keyUp, and popover events
+/*
 function dispatchKeyDown(event: KeyEvent) {
   listeners.onKeyDown.forEach(listener => {
     listener(event);
@@ -46,11 +48,12 @@ function dispatchPopover(event: PopoverEvent) {
     listener(event);
   });
 }
+*/
 
 function addKeyDownListener(listener: (event: KeyEvent) => void) {
   const count = listeners.onKeyDown.push(listener);
   if (count > 0) {
-    appBridge.consumeKeys(true);
+    appBridge?.consumeKeys(true);
   }
 }
 
@@ -64,7 +67,7 @@ function removeKeyDownListener(listener: (event: KeyEvent) => void) {
 function addKeyUpListener(listener: (event: KeyEvent) => void) {
   const count = listeners.onKeyUp.push(listener);
   if (count > 0) {
-    appBridge.consumeKeys(true);
+    appBridge?.consumeKeys(true);
   }
 }
 
@@ -102,7 +105,7 @@ export function useKeyDown(listener: (event: KeyEvent) => void) {
   const setConsumeKeys = useCallback(
     (active: boolean) => {
       setConsumeKeysPrime(active);
-      appBridge.consumeKeys(active);
+      appBridge?.consumeKeys(active);
     },
     [setConsumeKeysPrime],
   );
@@ -126,7 +129,7 @@ export function useKeyUp(listener: (event: KeyEvent) => void) {
   const setConsumeKeys = useCallback(
     (active: boolean) => {
       setConsumeKeysPrime(active);
-      appBridge.consumeKeys(active);
+      appBridge?.consumeKeys(active);
     },
     [setConsumeKeysPrime],
   );
@@ -136,7 +139,7 @@ export function useKeyUp(listener: (event: KeyEvent) => void) {
     return () => {
       if (removeKeyUpListener(listener)) {
         setConsumeKeys(false);
-        appBridge.consumeKeys(false);
+        appBridge?.consumeKeys(false);
       }
     };
   }, [listener, setConsumeKeys]);
@@ -154,16 +157,18 @@ export function usePopover(listener: (event: PopoverEvent) => void) {
 
 export function AppProvider({children}: React.PropsWithChildren) {
   useEffect(() => {
-    const keyDownListener = appBridge.addListener(
+    // TODO: Add listeners for keyDown, keyUp, and popover events
+    /*
+    const keyDownListener = appBridge?.addListener(
       'keyDown',
       (event: KeyEvent) => dispatchKeyDown(event),
     );
 
-    const keyUpListener = appBridge.addListener('keyUp', (event: KeyEvent) =>
+    const keyUpListener = appBridge?.addListener('keyUp', (event: KeyEvent) =>
       dispatchKeyUp(event),
     );
 
-    const popoverListener = appBridge.addListener(
+    const popoverListener = appBridge?.addListener(
       'popover',
       (event: PopoverEvent) => dispatchPopover(event),
     );
@@ -173,6 +178,7 @@ export function AppProvider({children}: React.PropsWithChildren) {
       keyUpListener.remove();
       popoverListener.remove();
     };
+    */
   }, []);
 
   return (

@@ -13,7 +13,7 @@ import StatusListItem from '@app/components/StatusListItem';
 import {useProjectNotifier} from '@app/hooks/useProjectNotifier';
 import {useProject} from '@app/hooks/useProjects';
 import {useBuildState, useProjectState} from '@app/hooks/useProjectState';
-import appBridge from '@app/lib/native';
+// import appBridge from '@app/modules/NativeAppBridge';
 
 import type {IconProps} from '@tamagui/helpers-icon';
 
@@ -157,12 +157,17 @@ export function ProjectListItemBuild({
       req = setTimeout(updateTimestamp, interval) as unknown as number;
     };
 
+    void req;
+    void isInBackground;
+    void updateTimestamp;
+    // TODO: appBridge events are not yet implemented
+    /*
     const onPopoverStateChange = (isVisible: boolean) => {
       isInBackground = !isVisible;
       isInBackground ? clearTimeout(req) : updateTimestamp();
     };
 
-    let subscription = appBridge.addListener('popover', onPopoverStateChange);
+    let subscription = appBridge?.addListener('popover', onPopoverStateChange);
     if (build && !isInBackground) {
       updateTimestamp();
     } else if (req !== -1) {
@@ -173,6 +178,7 @@ export function ProjectListItemBuild({
       clearTimeout(req);
       subscription.remove();
     };
+    */
   }, [build, variant]);
 
   return (

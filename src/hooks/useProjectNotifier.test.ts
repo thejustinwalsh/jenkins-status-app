@@ -4,7 +4,7 @@
 
 import {renderHook} from '@testing-library/react';
 
-import appBridge from '@app/lib/native';
+import appBridge from '@app/modules/NativeAppBridge';
 import {useProjectNotifier} from './useProjectNotifier';
 
 import type {NotificationState} from './useProjectNotifier';
@@ -129,7 +129,9 @@ jest.mock('jotai', () => ({
 
 describe('useProjectNotifier', () => {
   it('should notify on success state change', () => {
-    const sendNotification = jest.spyOn(appBridge, 'sendNotification');
+    const sendNotification = appBridge
+      ? jest.spyOn(appBridge, 'sendNotification')
+      : jest.fn();
     renderHook(() => useProjectNotifier('0'));
     expect(sendNotification).toHaveBeenCalledWith(
       'Notify Success succeeded',
@@ -139,7 +141,9 @@ describe('useProjectNotifier', () => {
   });
 
   it('should notify on failure state change', () => {
-    const sendNotification = jest.spyOn(appBridge, 'sendNotification');
+    const sendNotification = appBridge
+      ? jest.spyOn(appBridge, 'sendNotification')
+      : jest.fn();
     renderHook(() => useProjectNotifier('1'));
     expect(sendNotification).toHaveBeenCalledWith(
       'Notify Failure failed',

@@ -23,4 +23,11 @@
   "files.associations": {
     "macos/**/*.h": "objective-c",
   },
+  "i18n-ally.localesPaths": [
+    "macos/Pods/RCT-Folly/folly/lang",
+    "macos/Pods/boost/boost/locale",
+    "macos/Pods/Headers/Private/RCT-Folly/folly/lang",
+    "macos/Pods/boost/boost/predef/language",
+    "macos/Pods/Headers/Public/RCT-Folly/folly/lang"
+  ],
 }

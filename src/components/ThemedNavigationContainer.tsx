@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native';
 import {useTheme} from 'tamagui';
 
-import appBridge from '@app/lib/native';
+import appBridge from '@app/modules/NativeAppBridge';
 
 import type React from 'react';
 
@@ -15,7 +15,7 @@ export default function ThemedNavigationContainer({
   children: React.ReactNode;
 }) {
   const background = useTheme().background.get() || '#000000';
-  appBridge.setBackgroundColor(background);
+  appBridge?.setBackgroundColor(background);
 
   const theme = useMemo(
     () => ({

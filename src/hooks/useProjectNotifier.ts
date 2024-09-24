@@ -1,8 +1,8 @@
 import {useMemo} from 'react';
 import {useAtom} from 'jotai';
 
-import appBridge from '@app/lib/native';
 import {atomWithStorage} from '@app/lib/storage';
+import appBridge from '@app/modules/NativeAppBridge';
 import {useProject} from './useProjects';
 import {useBuildState, useProjectState} from './useProjectState';
 
@@ -53,7 +53,7 @@ export function useProjectNotifier(id: string) {
     // Notify on status change from previous build
     if (pending.status === 'failure') {
       if (project.notifications.onFailure) {
-        appBridge.sendNotification(
+        appBridge?.sendNotification(
           `${project.name} failed`,
           `Build #${pending.build} failed`,
           project.url,
@@ -64,7 +64,7 @@ export function useProjectNotifier(id: string) {
       pending.status !== notification.status
     ) {
       if (project.notifications.onSuccess) {
-        appBridge.sendNotification(
+        appBridge?.sendNotification(
           `${project.name} succeeded`,
           `Build #${pending.build} succeeded`,
           project.url,
@@ -76,7 +76,7 @@ export function useProjectNotifier(id: string) {
     ) {
       // TODO: add onStalled notification setting
       if (project.notifications.onFailure) {
-        appBridge.sendNotification(
+        appBridge?.sendNotification(
           `${project.name} stalled`,
           `Build #${pending.build} stalled`,
           project.url,
